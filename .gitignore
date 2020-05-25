@@ -1,0 +1,16 @@
+.DS_Store
+.venv
+
+# generated dirs
+apache-download/
+apache-projects/
+
+# every output goes here
+out*/
+
+# sub-projects
+log-placement-analyzer/
+log-removal/
+
+# IntelliJ
+.idea/
