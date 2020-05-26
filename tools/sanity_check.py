@@ -7,25 +7,29 @@ import pandas as pd
 
 
 def main(argv):
-    method_csv = os.path.abspath(argv[1])
-    method_df = pd.read_csv(method_csv)
-
-    methods_analysis = int(argv[2])
+    methods_copied = pd.read_csv(os.path.abspath(argv[1]))
+    methods_nologs = pd.read_csv(os.path.abspath(argv[2]))
+    analysis = pd.read_csv(os.path.abspath(argv[3]))
     print(
-        f"methods found from CK={method_df.shape[0]}",
-        f"methods found from analysis={methods_analysis}",
-        sep="\n"
+        "no-logs",
+        f"methods={methods_nologs.shape[0]}",
+        f"logged={(methods_nologs['logStatementsQty'] > 0).sum()}",
+        f"log_stmts={methods_nologs['logStatementsQty'].sum()}",
     )
-    assert method_df.shape[0] == methods_analysis
-
-    logged_methods = int(argv[3])
-    label_ck = (method_df["logStatementsQty"] > 0).sum()
+    methods_total = methods_copied.shape[0]
+    logged_methods = (methods_copied['logStatementsQty'] > 0).sum()
+    ratio = (logged_methods / methods_total) * 100
     print(
-        f"logged methods from CK={label_ck}",
-        f"logged methods from analysis={logged_methods}",
-        sep="\n"
+        "copied",
+        f"methods={methods_total}",
+        f"logged={logged_methods}",
+        f"ratio={ratio:.1f}%",
+        f"log_stmts={methods_copied['logStatementsQty'].sum()}",
     )
-    assert logged_methods == label_ck
+    print(
+        "analysis",
+        f"log_stmts={analysis.shape[0]}",
+    )
 
 
 if __name__ == "__main__":

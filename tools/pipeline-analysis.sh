@@ -61,6 +61,9 @@ analyze_log_statements() {
   echo Running analysis
   local classify_out="$OUTPUT_DIR/java_sources_classified.txt"
 
+  # XXX little hack for testing...
+  #cat $BASEDIR/TEMP.txt | awk '{print $1,"production-related"}' > $classify_out
+
   "$TOOLSDIR"/log-placement-analyzer "$classify_out" 1>"$OUTPUT_DIR/log_placement_analyzer.log"
 
   echo "$(($(cat "$OUTPUT_DIR/log-placement.csv" | wc -l) - 1))" log statements "(production only)"

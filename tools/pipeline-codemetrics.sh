@@ -3,50 +3,44 @@
 # Loads subject settings from an external bash script if informed
 # shellcheck source=/dev/null
 [[ -n "$1" ]] && . "$1"
-
-PROJECT_NAME="$(basename "$PROJECT_PATH")"
+PROJECT_NAME="$(basename $PROJECT_PATH)"
 
 BASEDIR="$(pwd)"
-TOOLS_DIR="$BASEDIR/tools"
-OUTPUT_BASEDIR="$BASEDIR/out/codemetrics/$PROJECT_NAME"
+TOOLSDIR="$BASEDIR/tools"
+LOG_REMOVAL_BASEDIR="$BASEDIR/out/log-removal/$PROJECT_NAME"
+ANALYSIS_DIR="$BASEDIR/out/analysis/$PROJECT_NAME"
 
 run_ck() {
-  local variant=$1
+    local project_path=$1
+    local output_dir=$2
 
-  echo "RUNNING CK with variant $variant"
+    echo "Running CK"
+    echo "input=$project_path"
+    echo "output=$output_dir"
 
-  local target="$BASEDIR/out/log-removal/$PROJECT_NAME/$variant"
-  local output="$OUTPUT_BASEDIR/$variant"
-  local output_log="$output/ck.log"
+    rm -rf $output_dir && mkdir -p $output_dir
 
-  if [[ ! -d $target ]]; then
-    echo "Oops, unable to find \"$target\" dir"
-    exit 1
-  fi
+    local ck_jar="$TOOLSDIR/ck-0.6.3-SNAPSHOT-jar-with-dependencies.jar"
+    local args="-Xms14g -Dlog4j.configuration=file:$TOOLSDIR/log4j.xml"
+    java $args -jar "$ck_jar" "$project_path" false 100 false &> $output_dir/ck.log
 
-  # Clean state
-  rm -rf "$output" && mkdir -p "$output"
-
-  ck_jar="$TOOLS_DIR/ck-0.6.3-SNAPSHOT-jar-with-dependencies.jar"
-  java_args="-Xmx14g -Dlog4j.configuration=file:$TOOLS_DIR/log4j.xml"
-
-  # shellcheck disable=SC2086
-  java $java_args -jar "$ck_jar" "$target" false 100 false &>"$output_log" &&
-    mv class.csv method.csv "$output"
-
-  echo "CKClassResult $(grep -c 'INFO CKClassResult' "$output_log")"
-  echo "Errors $(grep -c 'ERROR error' "$output_log")"
+    mv class.csv method.csv $output_dir
+    echo Done
 }
 
-# Compares CK output with our analysis numbers
-# Results must be consistent
-sanity_check() {
-  local ck_method_csv="$OUTPUT_BASEDIR/copied/method.csv"
-  local selection_log="$BASEDIR/out/analysis/$PROJECT_NAME/log_placement_analyzer.log"
-  local analysis_values=$(tail -n 1 "$selection_log" | awk '{print $2,$4}')
-  python3 "$TOOLS_DIR/sanity_check.py" $ck_method_csv $analysis_values
-}
+COPIED_SOURCES="$LOG_REMOVAL_BASEDIR/copied"
+CK_OUTPUT_COPIED="$BASEDIR/out/codemetrics/$PROJECT_NAME/copied"
+run_ck "$COPIED_SOURCES" "$CK_OUTPUT_COPIED"
 
-run_ck copied
-run_ck nolog
-sanity_check
+NOLOG_SOURCES="$LOG_REMOVAL_BASEDIR/nolog"
+CK_OUTPUT_NOLOG="$BASEDIR/out/codemetrics/$PROJECT_NAME/nolog"
+run_ck "$NOLOG_SOURCES" "$CK_OUTPUT_NOLOG"
+{
+  echo Known Issues:
+  python3 "$TOOLSDIR/sanity_check.py" \
+          "$CK_OUTPUT_COPIED/method.csv" \
+          "$CK_OUTPUT_NOLOG/method.csv" \
+          "$ANALYSIS_DIR/log-placement.csv"
+  tail -n 1 "$ANALYSIS_DIR/log_placement_analyzer.log"
+
+} | tee "$BASEDIR/out/codemetrics/$PROJECT_NAME/known-issue.txt"
