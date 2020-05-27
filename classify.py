@@ -11,8 +11,8 @@ def classify(source_path: str) -> str:
     if test(source_path, ["/docs/", "/examples/", "/sample", "sample/"]):
         return "doc-related"
     # Leaving this unclassified to be ignored on later stages
-    if test(source_path, ["giraph-core/templates"]):
-        return ""
+    if test(source_path, ["giraph-core/templates", "/src/main/resources/archetype-resources/", "zookeeper-server/src/main/java-filtered"]):
+        return "others"
     return "production-related"
 
 
