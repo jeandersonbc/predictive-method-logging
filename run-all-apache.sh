@@ -80,4 +80,4 @@ code_metrics() {
 time analysis
 time selection
 time log_removal
-#time code_metrics
+time code_metrics
