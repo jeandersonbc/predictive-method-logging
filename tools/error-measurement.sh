@@ -10,6 +10,4 @@ find out -type f -name 'known-issue.txt' |
       sed 's/ /,/g' |
       sed "s/^/$name-/"
 
-    echo ""
   done;
-
