@@ -82,7 +82,7 @@ set CMD_LINE_ARGS=%*
 :execute
 @rem Setup the command line
 
-set CLASSPATH=%APP_HOME%\lib\log-removal.jar;%APP_HOME%\lib\javaparser-core-3.15.14.jar
+set CLASSPATH=%APP_HOME%\lib\log-removal.jar;%APP_HOME%\lib\javaparser-core-3.16.1.jar
 
 @rem Execute log-removal
 "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %LOG_REMOVAL_OPTS%  -classpath "%CLASSPATH%" nl.tudelft.serg.Main %CMD_LINE_ARGS%

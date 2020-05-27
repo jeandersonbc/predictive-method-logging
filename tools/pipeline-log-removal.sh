@@ -89,4 +89,4 @@ cp -fr "$COPIED_SOURCES/" "$NOLOGS_SOURCES/"
 popd || exit 1
 
 echo Running log-removal
-time $BINS/log-removal "$NOLOGS_SOURCES" 1>"$OUTPUT_LOG"
+time $BINS/log-removal "$NOLOGS_SOURCES" &>"$OUTPUT_LOG"
