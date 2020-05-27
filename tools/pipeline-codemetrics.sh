@@ -14,10 +14,18 @@ run_ck() {
     local project_path=$1
     local output_dir=$2
 
-    echo "Running CK"
     echo "input=$project_path"
     echo "output=$output_dir"
 
+    # Rerunning CK can be costly... let's just reuse if metrics were already computed
+    if [[ -f "$output_dir/method.csv" ]] &&
+       [[ -f "$output_dir/class.csv" ]] &&
+       [[ -f "$output_dir/ck.log" ]]; then
+        echo "Found execution files, skipping CK run"
+        return 0
+    fi
+
+    echo "Running CK"
     rm -rf $output_dir && mkdir -p $output_dir
 
     local ck_jar="$TOOLSDIR/ck-0.6.3-SNAPSHOT-jar-with-dependencies.jar"
@@ -36,11 +44,10 @@ NOLOG_SOURCES="$LOG_REMOVAL_BASEDIR/nolog"
 CK_OUTPUT_NOLOG="$BASEDIR/out/codemetrics/$PROJECT_NAME/nolog"
 run_ck "$NOLOG_SOURCES" "$CK_OUTPUT_NOLOG"
 {
-  echo Known Issues:
+  echo Error measurement:
   python3 "$TOOLSDIR/sanity_check.py" \
           "$CK_OUTPUT_COPIED/method.csv" \
           "$CK_OUTPUT_NOLOG/method.csv" \
-          "$ANALYSIS_DIR/log-placement.csv"
-  tail -n 1 "$ANALYSIS_DIR/log_placement_analyzer.log"
+          "$ANALYSIS_DIR/pipeline-analysis.log"
 
 } | tee "$BASEDIR/out/codemetrics/$PROJECT_NAME/known-issue.txt"
