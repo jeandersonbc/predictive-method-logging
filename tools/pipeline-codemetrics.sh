@@ -43,6 +43,8 @@ run_ck "$COPIED_SOURCES" "$CK_OUTPUT_COPIED"
 NOLOG_SOURCES="$LOG_REMOVAL_BASEDIR/nolog"
 CK_OUTPUT_NOLOG="$BASEDIR/out/codemetrics/$PROJECT_NAME/nolog"
 run_ck "$NOLOG_SOURCES" "$CK_OUTPUT_NOLOG"
+
+pushd $BASEDIR/out/codemetrics/$PROJECT_NAME || exit 1
 {
   echo Error measurement:
   python3 "$TOOLSDIR/sanity_check.py" \
@@ -50,4 +52,6 @@ run_ck "$NOLOG_SOURCES" "$CK_OUTPUT_NOLOG"
           "$CK_OUTPUT_NOLOG/method.csv" \
           "$ANALYSIS_DIR/pipeline-analysis.log"
 
-} | tee "$BASEDIR/out/codemetrics/$PROJECT_NAME/known-issue.txt"
+} | tee "known-issue.txt"
+
+popd
