@@ -76,8 +76,25 @@ code_metrics() {
   echo Done CODE-METRICS step
 }
 
+create_dataset() {
+  echo Running DATASET step
+  if [[ ! -d "$SELECTION_DIR" ]]; then
+    echo Missing SELECTION dir. Did you run the run-selection script?
+    echo Aborting
+    exit 1
+  fi
+
+  find "$SELECTION_DIR" -type f -path '*.sh' |
+    while read -r subject; do
+      echo Running "$subject"
+      time "$TOOLS_DIR/build-datasets.sh" "$subject"
+    done
+  echo Done DATASET step
+}
+
 # main
 time analysis
 time selection
 time log_removal
 time code_metrics
+time create_dataset

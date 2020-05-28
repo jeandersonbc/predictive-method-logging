@@ -16,6 +16,12 @@ COPIED_OUT="$CODEMETRICS_DIR/copied"
 
 rm -rf "$OUTPUT_DIR" && mkdir -p "$OUTPUT_DIR"
 
-time python3 "$TOOLSDIR/build-datasets.py" "$CODEMETRICS_DIR/nolog" "$CODEMETRICS_DIR/copied" &&
-    mv dataset.csv $OUTPUT_DIR
+pushd "$OUTPUT_DIR" || exit 1
+{
+time python3 "$TOOLSDIR/build-datasets.py" \
+             "$CODEMETRICS_DIR/nolog" \
+             "$CODEMETRICS_DIR/copied"
+
+} | tee dataset.log
+popd || exit 1
 
