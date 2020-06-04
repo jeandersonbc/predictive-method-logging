@@ -11,7 +11,7 @@ def main(argv):
     methods_nologs = pd.read_csv(os.path.abspath(argv[2]))
 
     cols = ["file", "class", "method"]
-    sample = methods_nologs.loc[methods_nologs['logStatementsQty'] > 0, cols].head()
+    sample = methods_nologs.loc[methods_nologs['logStatementsQty'] > 0, cols]
     if (sample.shape[0] > 0):
         sample.to_csv("shouldnt-have-log.csv", index=False)
 

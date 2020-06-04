@@ -3,7 +3,7 @@
 # Loads subject settings from an external bash script if informed
 # shellcheck source=/dev/null
 [[ -n "$1" ]] && . "$1"
-PROJECT_NAME="$(basename $PROJECT_PATH)"
+PROJECT_NAME="$(basename "$PROJECT_PATH")"
 
 BASEDIR="$(pwd)"
 TOOLSDIR="$BASEDIR/tools"
@@ -11,10 +11,10 @@ LOG_REMOVAL_BASEDIR="$BASEDIR/out/log-removal/$PROJECT_NAME"
 ANALYSIS_DIR="$BASEDIR/out/analysis/$PROJECT_NAME"
 
 run_ck() {
-    local project_path=$1
+    local input_path=$1
     local output_dir=$2
 
-    echo "input=$project_path"
+    echo "input=$input_path"
     echo "output=$output_dir"
 
     # Rerunning CK can be costly... let's just reuse if metrics were already computed
@@ -26,13 +26,16 @@ run_ck() {
     fi
 
     echo "Running CK"
-    rm -rf $output_dir && mkdir -p $output_dir
+    rm -rf "$output_dir" && mkdir -p "$output_dir"
 
     local ck_jar="$TOOLSDIR/ck-0.6.3-SNAPSHOT-jar-with-dependencies.jar"
     local args="-Xms14g -Dlog4j.configuration=file:$TOOLSDIR/log4j.xml"
-    java $args -jar "$ck_jar" "$project_path" false 100 false &> $output_dir/ck.log
 
-    mv class.csv method.csv $output_dir
+    # intended behavior
+    # shellcheck disable=SC2086
+    java $args -jar "$ck_jar" "$input_path" false 100 false &> $output_dir/ck.log
+
+    mv class.csv method.csv "$output_dir"
     echo Done
 }
 
@@ -44,7 +47,7 @@ NOLOG_SOURCES="$LOG_REMOVAL_BASEDIR/nolog"
 CK_OUTPUT_NOLOG="$BASEDIR/out/codemetrics/$PROJECT_NAME/nolog"
 run_ck "$NOLOG_SOURCES" "$CK_OUTPUT_NOLOG"
 
-pushd $BASEDIR/out/codemetrics/$PROJECT_NAME || exit 1
+pushd "$BASEDIR/out/codemetrics/$PROJECT_NAME" || exit 1
 {
   echo Error measurement:
   python3 "$TOOLSDIR/sanity_check.py" \
@@ -54,4 +57,4 @@ pushd $BASEDIR/out/codemetrics/$PROJECT_NAME || exit 1
 
 } | tee "known-issue.txt"
 
-popd
+popd || exit 1
