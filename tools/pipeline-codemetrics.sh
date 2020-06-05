@@ -21,8 +21,9 @@ run_ck() {
     if [[ -f "$output_dir/method.csv" ]] &&
        [[ -f "$output_dir/class.csv" ]] &&
        [[ -f "$output_dir/ck.log" ]]; then
-        echo "Found execution files, skipping CK run"
-        return 0
+        #echo "Found execution files, skipping CK run"
+        #return 0
+        echo "Overwritting stuff..."
     fi
 
     echo "Running CK"
