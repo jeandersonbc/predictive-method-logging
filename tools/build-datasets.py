@@ -18,6 +18,19 @@ def prepare_labels(dfx: pd.DataFrame, labels: pd.DataFrame) -> pd.DataFrame:
                     suffixes=("_orig", "_label"))
 
 
+def check_missing_points(left: pd.DataFrame, right: pd.DataFrame):
+    cols = ["file", "class", "method"]
+    L = left[cols].sort_values(by=cols).reset_index()
+    R = right[cols].sort_values(by=cols).reset_index()
+    for idx, L_row in L.iterrows():
+        R_row = R.loc[idx]
+        if not L_row[cols].equals(R_row[cols]):
+            print("Missing on the removed side:")
+            print(L_row["file"])
+            print(L_row["class"])
+            print(L_row["method"])
+            return
+
 def main(argv):
     nolog_path = argv[1]
     copied_path = argv[2]
@@ -38,12 +51,14 @@ def main(argv):
     nolog_method["file"] = nolog_method["file"].apply(
         lambda e: re.sub(nolog_preffix, ".", e)
     )
-    cols = ["file", "class", "method", "logStatementsQty"]
-    labels_method = pd.read_csv(os.path.join(copied_path, "method.csv"))[cols]
+    labels_method = pd.read_csv(
+        os.path.join(copied_path, "method.csv")
+    )[["file", "class", "method", "logStatementsQty"]]
     labels_method["file"] = labels_method["file"].apply(
         lambda e: re.sub(copied_preffix, ".", e)
     )
-    assert labels_method.shape[0] == nolog_method.shape[0]
+    if not labels_method.shape[0] == nolog_method.shape[0]:
+        check_missing_points(labels_method, nolog_method)
 
     # Merging, and so on...
     merged = merge(nolog_class, nolog_method)
