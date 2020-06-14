@@ -68,7 +68,7 @@ analyze_log_statements() {
 }
 
 BASEDIR="$(pwd)"
-PYSCRIPTS="$BASEDIR"
+PYSCRIPTS="$BASEDIR/tools"
 TOOLSDIR="$BASEDIR/tools/bin"
 
 OUTPUT_DIR="$BASEDIR/out/analysis/$(basename "$PROJECT_PATH")"

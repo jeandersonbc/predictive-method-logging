@@ -29,7 +29,7 @@ sed 's/,/ /' apache-projects.csv |
     # expected revision based on the input CSV.
     {
       echo "#!/usr/bin/env bash"
-      echo "PROJECT_PATH=\"$output\""
+      echo "PROJECT_PATH=\"\$(pwd)/$(basename "$DOWNLOAD_DIR")/$name\""
       echo "REV=$rev"
     } > "$output_double_check"
 
