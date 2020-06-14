@@ -4,6 +4,12 @@ Predictive Method Logging
 
 Learning whether a method should be logged or not based on code metrics.
 
+
+### Getting Started
+
+1. Get the initial list of Apache projects: `./gradlew fetch-apache-projects`
+2. Build the auxiliary tools: `./gradlew deploy-aux-tools`
+
 ### Components
 
 1. `log-identifier`: Cross-project utility that identifies log statements based on regex
