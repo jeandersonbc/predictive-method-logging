@@ -2,6 +2,7 @@ package nl.tudelft.serg;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -76,7 +77,7 @@ public class App {
                 data.forEach(e -> {
                     try {
                         csv.printRecord(sourceFilePath, data.size(),
-                                e.clazz, e.method, e.enclosingBlock);
+                                e.clazz, StringEscapeUtils.escapeCsv(e.method), e.enclosingBlock);
                         statements.println(e.logStatement);
                     } catch (IOException ioException) {
                         ioException.printStackTrace();

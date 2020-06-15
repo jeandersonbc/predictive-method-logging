@@ -20,7 +20,7 @@ class Sample {
     }
 
     // Method 4 / Logged 4
-    public Sample(int a, int b) {
+    public Sample(@SomeAnnotation("test 123") Foo bar, int b) {
         LOG.info("hello from other constructor...");
         doSomething(new Interface() {
             // Method 5 / Logged 5
@@ -38,7 +38,7 @@ class Sample {
     }
 
     // Method 7 / Logged 6
-    void process() {
+    void process(List<Object> etc) {
         log.info("Started processing");
 
         if (1 < 3) {
@@ -79,7 +79,7 @@ class Sample {
             doSomething(new Interface() {
 
                 // Method 9 / Logged 8
-                void run(int a) {
+                void run(int []a) {
                     LOG.info("anonymous class...");
                 }
             });
@@ -91,7 +91,7 @@ class Sample {
             doSomething(new Interface() {
 
                 // Method 11 / Logged 9
-                void run(int a) {
+                void run(String... varArgs) {
                     LOG.info("anonymous class...");
                 }
             });

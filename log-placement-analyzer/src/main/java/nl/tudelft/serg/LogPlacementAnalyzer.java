@@ -74,7 +74,22 @@ public class LogPlacementAnalyzer extends ASTVisitor {
 
     @Override
     public boolean visit(MethodDeclaration node) {
-        methodContext.addLast(node.getName().getFullyQualifiedName() + "/" + node.parameters().size());
+        String methodName = node.getName().getFullyQualifiedName() + "(";
+        List<String> params = new LinkedList<>();
+        for (Object e : node.parameters()) {
+            if (e instanceof SingleVariableDeclaration) {
+                SingleVariableDeclaration paramDeclaration = (SingleVariableDeclaration) e;
+                Type type = paramDeclaration.getType();
+                String typeName = type.toString();
+                if (paramDeclaration.isVarargs()) {
+                    typeName += "[]";
+                }
+                params.add(typeName);
+            }
+        }
+        methodName += String.join(", ", params) + ")";
+
+        methodContext.addLast(methodName);
         methodCounter++;
         isLoggedContext.addLast(false);
         return super.visit(node);

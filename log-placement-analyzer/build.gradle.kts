@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation("org.eclipse.jdt:org.eclipse.jdt.core:3.21.0")
     implementation("org.apache.commons:commons-csv:1.8")
+    implementation("org.apache.commons:commons-text:1.8")
     implementation(project(":log-identifier"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.2")

@@ -3,6 +3,7 @@
  */
 package nl.tudelft.serg;
 
+import com.sun.tools.javac.util.List;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -12,8 +13,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Hashtable;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LogPlacementAnalyzerTest {
 
@@ -44,6 +48,22 @@ class LogPlacementAnalyzerTest {
         assertEquals(11, analyzer.countingVisitedMethods());
         assertEquals(17, analyzer.visitedLogStatements().size());
         assertEquals(9, analyzer.countingLoggedMethods());
+    }
+
+    @Test
+    void testMethodSignature() {
+        Set<String> visitedMethodsWithLogStatements = analyzer.visitedLogStatements().stream().map(e -> e.method).collect(Collectors.toSet());
+        List.of("(initializer 1)",
+                "(initializer 2)",
+                "Sample()",
+                "run(int[])",
+                "process(List<Object>)",
+                "Sample(Foo, int)",
+                "run(String[])"
+                ).forEach(
+                e -> assertTrue(visitedMethodsWithLogStatements.contains(e),
+                        String.format("%s not present in %s", e, visitedMethodsWithLogStatements))
+        );
     }
 
 }
