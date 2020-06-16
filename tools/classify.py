@@ -11,7 +11,15 @@ def classify(source_path: str) -> str:
     if test(source_path, ["/docs/", "/examples/", "/sample", "sample/"]):
         return "doc-related"
     # Leaving this unclassified to be ignored on later stages
-    if test(source_path, ["giraph-core/templates", "/src/main/resources/archetype-resources/", "zookeeper-server/src/main/java-filtered", "org/apache/tez/mapreduce/hadoop/DeprecatedKeys.java"]):
+    if test(
+        source_path,
+        [
+            "giraph-core/templates",
+            "/src/main/resources/archetype-resources/",
+            "zookeeper-server/src/main/java-filtered",
+            "org/apache/tez/mapreduce/hadoop/DeprecatedKeys.java",
+        ],
+    ):
         return "others"
     return "production-related"
 
@@ -29,4 +37,5 @@ def main(argv):
 
 if __name__ == "__main__":
     from sys import argv
+
     main(argv)

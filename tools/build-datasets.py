@@ -7,15 +7,15 @@ import pandas as pd
 def merge(dfx: pd.DataFrame, dfy: pd.DataFrame) -> pd.DataFrame:
     class_df = dfx.drop(columns=["modifiers", "tcc", "lcc", "logStatementsQty"])
     methods_df = dfy.drop(columns=["modifiers", "hasJavaDoc", "line"])
-    return pd.merge(methods_df, class_df,
-                    on=["file", "class"],
-                    suffixes=("_method", "_class"))
+    return pd.merge(
+        methods_df, class_df, on=["file", "class"], suffixes=("_method", "_class")
+    )
 
 
 def prepare_labels(dfx: pd.DataFrame, labels: pd.DataFrame) -> pd.DataFrame:
-    return pd.merge(dfx, labels,
-                    on=["file", "method", "class"],
-                    suffixes=("_orig", "_label"))
+    return pd.merge(
+        dfx, labels, on=["file", "method", "class"], suffixes=("_orig", "_label")
+    )
 
 
 def check_missing_points(left: pd.DataFrame, right: pd.DataFrame):
@@ -30,6 +30,7 @@ def check_missing_points(left: pd.DataFrame, right: pd.DataFrame):
             print(L_row["class"])
             print(L_row["method"])
             return
+
 
 def main(argv):
     nolog_path = argv[1]
@@ -51,9 +52,9 @@ def main(argv):
     nolog_method["file"] = nolog_method["file"].apply(
         lambda e: re.sub(nolog_preffix, ".", e)
     )
-    labels_method = pd.read_csv(
-        os.path.join(copied_path, "method.csv")
-    )[["file", "class", "method", "logStatementsQty"]]
+    labels_method = pd.read_csv(os.path.join(copied_path, "method.csv"))[
+        ["file", "class", "method", "logStatementsQty"]
+    ]
     labels_method["file"] = labels_method["file"].apply(
         lambda e: re.sub(copied_preffix, ".", e)
     )
@@ -67,17 +68,18 @@ def main(argv):
     merged = prepare_labels(merged, labels_method)
 
     merged["label"] = merged["logStatementsQty_label"] > 0
-    dataset_full = merged.drop(columns=[c for c in list(merged) if "logStatementsQty_label" in c])
+    dataset_full = merged.drop(
+        columns=[c for c in list(merged) if "logStatementsQty_label" in c]
+    )
     dataset_full.to_csv("dataset_full.csv", index=False)
     print(
         f"shape={dataset_full.shape}",
         f"logged_methods={dataset_full['label'].sum()}",
         f"noise={(dataset_full['logStatementsQty_orig'] > 0).sum()}",
         f"missed_log_stmts={dataset_full['logStatementsQty_orig'].sum()}",
-        sep="\n"
+        sep="\n",
     )
 
 
 if __name__ == "__main__":
     main(argv)
-

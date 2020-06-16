@@ -11,12 +11,12 @@ def main(argv):
     methods_nologs = pd.read_csv(os.path.abspath(argv[2]))
 
     cols = ["file", "class", "method"]
-    sample = methods_nologs.loc[methods_nologs['logStatementsQty'] > 0, cols]
-    if (sample.shape[0] > 0):
+    sample = methods_nologs.loc[methods_nologs["logStatementsQty"] > 0, cols]
+    if sample.shape[0] > 0:
         sample.to_csv("shouldnt-have-log.csv", index=False)
 
     methods_total = methods_nologs.shape[0]
-    logged_methods = (methods_nologs['logStatementsQty'] > 0).sum()
+    logged_methods = (methods_nologs["logStatementsQty"] > 0).sum()
     ratio = (logged_methods / methods_total) * 100
     print(
         "no-logs",
@@ -26,7 +26,7 @@ def main(argv):
         f"log_stmts={methods_nologs['logStatementsQty'].sum()}",
     )
     methods_total = methods_copied.shape[0]
-    logged_methods = (methods_copied['logStatementsQty'] > 0).sum()
+    logged_methods = (methods_copied["logStatementsQty"] > 0).sum()
     ratio = (logged_methods / methods_total) * 100
     print(
         "copied",
@@ -40,8 +40,8 @@ def main(argv):
     with open(analysis_output_file) as f:
         lines = [line.strip() for line in f][-3:-1]
 
-    logStatements= lines[0].split(" ")[0]
-    fields= lines[1].split(" ")
+    logStatements = lines[0].split(" ")[0]
+    fields = lines[1].split(" ")
     print(
         "analysis",
         f"methods={fields[1]}",
@@ -49,6 +49,7 @@ def main(argv):
         f"ratio={int(fields[3]) / int(fields[1]) * 100:.1f}",
         f"log_stmts={logStatements}",
     )
+
 
 if __name__ == "__main__":
     main(argv)
