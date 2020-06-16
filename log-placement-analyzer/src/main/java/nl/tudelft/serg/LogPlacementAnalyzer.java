@@ -43,6 +43,23 @@ public class LogPlacementAnalyzer extends ASTVisitor {
     }
 
     @Override
+    public boolean visit(EnumDeclaration node) {
+        String name = node.getName().toString();
+        if (node.isMemberTypeDeclaration()) {
+            name = String.format("%s$%s", classContext.peekLast(), name);
+        }
+        classContext.addLast(name);
+        return super.visit(node);
+    }
+
+    @Override
+    public void endVisit(EnumDeclaration node) {
+        classContext.removeLast();
+        anonymousClassContextCounter = 0;
+        super.endVisit(node);
+    }
+
+    @Override
     public boolean visit(AnonymousClassDeclaration node) {
         String name = String.format("%s$%s%d", classContext.peekLast(), "Anonymous", ++anonymousClassContextCounter);
         classContext.addLast(name);
@@ -114,6 +131,15 @@ public class LogPlacementAnalyzer extends ASTVisitor {
             ExpressionStatement expr = (ExpressionStatement) parent;
             String rawExpr = expr.toString().trim();
             if (LogIdentifier.isLogStatement(rawExpr)) {
+
+                // TODO Known Issue
+                // This is a lambda expression outside a method body (e.g., parameter to some constructor)
+                // We skip this...
+                if (isLoggedContext.isEmpty()) {
+                    return super.visit(node);
+                }
+
+                // Update log context from current method
                 if (!isLoggedContext.peekLast()) {
                     isLoggedContext.removeLast();
                     isLoggedContext.addLast(true);
