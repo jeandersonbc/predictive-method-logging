@@ -67,6 +67,17 @@ analyze_log_statements() {
   cat "$OUTPUT_DIR/log_placement_analyzer.log" | grep 'methods.*logged.*ratio'
 }
 
+log_statements_stats() {
+    echo "Computing log placement stats"
+    local input_csv="$OUTPUT_DIR/log-placement.csv"
+    if [ ! -f "$input_csv" ]; then
+      echo Missing input csv
+      exit 1
+    fi
+    "$PYSCRIPTS/placement-stats.py" "$input_csv" &&
+      pdfcrop "$OUTPUT_DIR/dist-logstmts.pdf" "$OUTPUT_DIR/dist-logstmts.pdf"
+}
+
 BASEDIR="$(pwd)"
 PYSCRIPTS="$BASEDIR/tools"
 TOOLSDIR="$BASEDIR/tools/bin"
@@ -85,3 +96,5 @@ mkdir -p "$OUTPUT_DIR"
     analyze_log_statements
   popd || exit 1
 } | tee "$OUTPUT_DIR/pipeline-analysis.log"
+
+log_statements_stats | tee "$OUTPUT_DIR/stats.log"
