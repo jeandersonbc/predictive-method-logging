@@ -18,6 +18,7 @@ RANDOM_SEED = 2357
 warnings.warn = lambda *args, **kwargs: None
 
 
+# TODO frac should be read from command line
 def load_dataset(fpath, remove_noise=False, frac=None):
     df = pd.read_csv(fpath)
     if remove_noise:
@@ -94,9 +95,7 @@ def save_feature_importance(data):
 
 
 def run(model_name, csv_path):
-    # For dev purposes
-    dataset_frac = 0.01
-    data = load_dataset(csv_path, frac=dataset_frac)
+    data = load_dataset(csv_path)
 
     # Train(80%) Test (20%) split
     X = data.drop(columns=["label"])
