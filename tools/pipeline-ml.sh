@@ -28,7 +28,7 @@ run_ml_experiments() {
     rm -rf "$output_dir" && mkdir -p "$output_dir"
     echo $PROJECT_NAME: Running model $model
     pushd "$output_dir" || exit 1
-    time logpred-method "$model" "$DATASET_CSV" | tee logpred-method.log
+    time python3 -m logpred_method "$model" "$DATASET_CSV" | tee logpred-method.log
     popd || exit 1
   done
 }
