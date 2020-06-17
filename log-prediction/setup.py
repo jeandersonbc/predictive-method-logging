@@ -12,6 +12,7 @@ setup(
     entry_points={
         "console_scripts": ["logpred-method=logpred_method.command_line:main"]
     },
+    python_requires=">=3.6",
     install_requires=[
         "imbalanced-learn==0.7.0",
         "scikit-learn==0.23.1",
