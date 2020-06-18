@@ -83,8 +83,7 @@ time copy_files
 check_expected_files
 
 [[ -d "$NOLOGS_SOURCES" ]] && rm -rf "$NOLOGS_SOURCES"
-mkdir -p "$NOLOGS_SOURCES"
-cp -fr "$COPIED_SOURCES/" "$NOLOGS_SOURCES/"
+cp -r "$COPIED_SOURCES" "$NOLOGS_SOURCES"
 
 popd || exit 1
 
