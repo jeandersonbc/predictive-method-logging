@@ -36,7 +36,7 @@ run_ml_experiments() {
         rm -rf "$output_dir" && mkdir -p "$output_dir"
         echo $PROJECT_NAME: Running balancing option $balancing
         pushd "$output_dir" || exit 1
-        #time python3 -m logpred_method "$model" "$DATASET_CSV" "$balancing" | tee logpred-method.log
+        time python3 -m logpred_method "$model" "$DATASET_CSV" --balancing "$balancing" | tee logpred-method.log
         popd || exit 1
     done
   done

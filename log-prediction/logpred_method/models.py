@@ -1,4 +1,7 @@
 import numpy as np
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline as ImbPipeline
+from imblearn.under_sampling import RandomUnderSampler
 from sklearn.compose import make_column_transformer
 from sklearn.ensemble import (
     AdaBoostClassifier,
@@ -8,11 +11,11 @@ from sklearn.ensemble import (
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import (
+    MinMaxScaler,
+    Normalizer,
     OneHotEncoder,
     RobustScaler,
     StandardScaler,
-    MinMaxScaler,
-    Normalizer,
 )
 from sklearn.tree import DecisionTreeClassifier
 
@@ -78,7 +81,7 @@ def load_logreg():
     return LogisticRegression(random_state=RANDOM_SEED), params
 
 
-def create_pipeline(categ_cols, model_param):
+def create_pipeline(categ_cols, model_param, balancing=None):
     if model_param == "rf":
         model, params = load_random_forest()
     elif model_param == "dt":
@@ -92,8 +95,22 @@ def create_pipeline(categ_cols, model_param):
     else:
         raise Exception(f"Unkown parameter {model_param}")
 
+    # Common pipeline steps
     column_transformer = make_column_transformer(
         (OneHotEncoder(), categ_cols), remainder="passthrough"
     )
-    pipeline = Pipeline(steps=[("transformer", column_transformer), ("clf", model)])
+    pipeline_steps = [("transformer", column_transformer), ("clf", model)]
+
+    # Actual pipeline instantiation
+    if balancing is None:
+        pipeline = Pipeline(steps=pipeline_steps)
+    elif balancing in {"smote", "rus"}:
+        sampler = RandomUnderSampler(random_state=RANDOM_SEED)
+        if balancing == "rus":
+            sampler = SMOTE(random_state=RANDOM_SEED)
+        pipeline_steps.insert(1, ("sampler", sampler))
+        pipeline = ImbPipeline(steps=pipeline_steps)
+    else:
+        raise Exception(f"Unknown balancing {balancing}")
+
     return pipeline, params

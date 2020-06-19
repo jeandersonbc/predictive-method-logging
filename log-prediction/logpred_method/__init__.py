@@ -116,7 +116,7 @@ def run(model_name, csv_path, balancing=None):
     print("qualitative:", len(categ_cols), categ_cols)
     print("quantitative:", len(num_cols), num_cols)
 
-    pipe, params = create_pipeline(categ_cols, model_name)
+    pipe, params = create_pipeline(categ_cols, model_name, balancing)
 
     # Hyper-parameter tunning
     search = RandomizedSearchCV(
