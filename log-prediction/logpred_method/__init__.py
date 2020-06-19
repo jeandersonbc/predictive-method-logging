@@ -19,7 +19,7 @@ warnings.warn = lambda *args, **kwargs: None
 
 
 # TODO frac should be read from command line
-def load_dataset(fpath, remove_noise=False, frac=0.01):
+def load_dataset(fpath, remove_noise=False, frac=None):
     df = pd.read_csv(fpath)
     if remove_noise:
         df = df[~(df["logStatementsQty_orig"] > 0)]
