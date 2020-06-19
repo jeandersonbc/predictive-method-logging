@@ -10,7 +10,7 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import RandomizedSearchCV, train_test_split
 
-from logpred_method.models import init_pipeline
+from logpred_method.models import create_pipeline
 
 RANDOM_SEED = 2357
 
@@ -19,7 +19,7 @@ warnings.warn = lambda *args, **kwargs: None
 
 
 # TODO frac should be read from command line
-def load_dataset(fpath, remove_noise=False, frac=None):
+def load_dataset(fpath, remove_noise=False, frac=0.01):
     df = pd.read_csv(fpath)
     if remove_noise:
         df = df[~(df["logStatementsQty_orig"] > 0)]
@@ -94,7 +94,7 @@ def save_feature_importance(data):
     pd.DataFrame.from_dict(as_dict).to_csv("feature_importance.csv", index=False)
 
 
-def run(model_name, csv_path):
+def run(model_name, csv_path, balancing=None):
     data = load_dataset(csv_path)
 
     # Train(80%) Test (20%) split
@@ -116,7 +116,7 @@ def run(model_name, csv_path):
     print("qualitative:", len(categ_cols), categ_cols)
     print("quantitative:", len(num_cols), num_cols)
 
-    pipe, params = init_pipeline(categ_cols, model_name)
+    pipe, params = create_pipeline(categ_cols, model_name)
 
     # Hyper-parameter tunning
     search = RandomizedSearchCV(
@@ -150,6 +150,7 @@ def run(model_name, csv_path):
     score = {k: v.item() for k, v in score.items()}
 
     score["model"] = model_name
+    score["balancing"] = balancing if balancing is not None else "-"
     save_score(score)
     print("SCORE:", score)
 

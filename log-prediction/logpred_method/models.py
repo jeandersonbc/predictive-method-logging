@@ -19,7 +19,7 @@ from sklearn.tree import DecisionTreeClassifier
 RANDOM_SEED = 2357
 
 
-def load_random_forest(categ_cols):
+def load_random_forest():
     params = {
         "clf__n_estimators": [10, 50, 100, 150, 200],
         "clf__criterion": ["gini", "entropy"],
@@ -28,28 +28,10 @@ def load_random_forest(categ_cols):
         "clf__min_samples_split": [2, 3, 4, 5, 10],
         "clf__bootstrap": [True, False],
     }
-    # Model init
-    model = RandomForestClassifier(random_state=RANDOM_SEED)
-
-    # Data processing and Pipeline
-    pipeline = Pipeline(
-        steps=[
-            (
-                "transformer",
-                make_column_transformer(
-                    (OneHotEncoder(), categ_cols), remainder="passthrough"
-                ),
-            ),
-            ("clf", model),
-        ]
-    )
-    return (
-        pipeline,
-        params,
-    )
+    return RandomForestClassifier(random_state=RANDOM_SEED), params
 
 
-def load_extra_trees(categ_cols):
+def load_extra_trees():
     params = {
         "clf__n_estimators": [10, 50, 100, 150, 200],
         "clf__criterion": ["gini", "entropy"],
@@ -58,29 +40,10 @@ def load_extra_trees(categ_cols):
         "clf__min_samples_split": [2, 3, 4, 5, 10],
         "clf__bootstrap": [True, False],
     }
-
-    # Model init
-    model = ExtraTreesClassifier(random_state=RANDOM_SEED)
-
-    # Data processing and Pipeline
-    pipeline = Pipeline(
-        steps=[
-            (
-                "transformer",
-                make_column_transformer(
-                    (OneHotEncoder(), categ_cols), remainder="passthrough"
-                ),
-            ),
-            ("clf", model),
-        ]
-    )
-    return (
-        pipeline,
-        params,
-    )
+    return ExtraTreesClassifier(random_state=RANDOM_SEED), params
 
 
-def load_decision_tree(categ_cols):
+def load_decision_tree():
     params = {
         "clf__criterion": ["gini", "entropy"],
         "clf__splitter": ["best", "random"],
@@ -88,59 +51,20 @@ def load_decision_tree(categ_cols):
         "clf__max_features": ["auto", "sqrt", "log2", None],
         "clf__min_samples_split": [2, 3, 5, 10, 11],
     }
-
-    # Model init
-    model = DecisionTreeClassifier(random_state=RANDOM_SEED)
-
-    # Data processing and Pipeline
-    pipeline = Pipeline(
-        steps=[
-            (
-                "transformer",
-                make_column_transformer(
-                    (OneHotEncoder(), categ_cols), remainder="passthrough"
-                ),
-            ),
-            ("clf", model),
-        ]
-    )
-    return (
-        pipeline,
-        params,
-    )
+    return DecisionTreeClassifier(random_state=RANDOM_SEED), params
 
 
-def load_ada_boost(categ_cols):
+def load_ada_boost():
     params = {
         "clf__n_estimators": [10, 50, 100, 150, 200],
         "clf__learning_rate": [0.0001, 0.001, 0.01, 0.1, 1.0],
         "clf__algorithm": ["SAMME", "SAMME.R"],
     }
-
-    # Model init
-    model = AdaBoostClassifier(random_state=RANDOM_SEED)
-
-    # Data processing and Pipeline
-    pipeline = Pipeline(
-        steps=[
-            (
-                "transformer",
-                make_column_transformer(
-                    (OneHotEncoder(), categ_cols), remainder="passthrough"
-                ),
-            ),
-            ("clf", model),
-        ]
-    )
-    return (
-        pipeline,
-        params,
-    )
+    return AdaBoostClassifier(random_state=RANDOM_SEED), params
 
 
-def load_logreg(categ_cols):
+def load_logreg():
     r = np.random.RandomState(seed=RANDOM_SEED)
-
     params = {
         "clf__max_iter": np.arange(250, 350, 10),
         "clf__C": r.uniform(0.01, 10, 10),
@@ -151,38 +75,25 @@ def load_logreg(categ_cols):
             Normalizer(),
         ],
     }
-
-    # Model init
-    model = LogisticRegression(random_state=RANDOM_SEED)
-
-    # Data processing and Pipeline
-    pipeline = Pipeline(
-        steps=[
-            (
-                "transformer",
-                make_column_transformer(
-                    (OneHotEncoder(), categ_cols), remainder=RobustScaler()
-                ),
-            ),
-            ("clf", model),
-        ]
-    )
-    return (
-        pipeline,
-        params,
-    )
+    return LogisticRegression(random_state=RANDOM_SEED), params
 
 
-def init_pipeline(categ_cols, model_param):
+def create_pipeline(categ_cols, model_param):
     if model_param == "rf":
-        return load_random_forest(categ_cols)
-    if model_param == "dt":
-        return load_decision_tree(categ_cols)
-    if model_param == "et":
-        return load_extra_trees(categ_cols)
-    if model_param == "ab":
-        return load_ada_boost(categ_cols)
-    if model_param == "lr":
-        return load_logreg(categ_cols)
+        model, params = load_random_forest()
+    elif model_param == "dt":
+        model, params = load_decision_tree()
+    elif model_param == "et":
+        model, params = load_extra_trees()
+    elif model_param == "ab":
+        model, params = load_ada_boost()
+    elif model_param == "lr":
+        model, params = load_logreg()
     else:
         raise Exception(f"Unkown parameter {model_param}")
+
+    column_transformer = make_column_transformer(
+        (OneHotEncoder(), categ_cols), remainder="passthrough"
+    )
+    pipeline = Pipeline(steps=[("transformer", column_transformer), ("clf", model)])
+    return pipeline, params

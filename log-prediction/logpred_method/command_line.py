@@ -1,9 +1,16 @@
-from sys import argv
+import argparse
 
 import logpred_method
 
 
 def main():
-    model_name = argv[1]
-    csv_path = argv[2]
-    logpred_method.run(model_name=model_name, csv_path=csv_path)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("model_name", choices="rf ab dt lr et".split(" "))
+    parser.add_argument("csv_path")
+    parser.add_argument("--balancing", default=None, choices="smote rus".split(" "))
+    args = parser.parse_args()
+
+    model_name = args.model_name
+    csv_path = args.csv_path
+    balancing = args.balancing
+    logpred_method.run(model_name=model_name, csv_path=csv_path, balancing=balancing)
