@@ -18,16 +18,24 @@ RANDOM_SEED = 2357
 warnings.warn = lambda *args, **kwargs: None
 
 
-def load_dataset(fpath, remove_noise=False, fraction=None):
+def load_dataset(fpath, drops=(), remove_noise=False, fraction=None):
     df = pd.read_csv(fpath)
     if remove_noise:
         df = df[~(df["logStatementsQty_orig"] > 0)]
     df.set_index(["file", "class", "method"], inplace=True)
     df = df.drop(columns=["logStatementsQty_orig"])
+
     # Dataset reduction to for dev purposes
     if fraction:
         df = df.sample(frac=fraction, random_state=RANDOM_SEED)
-    return df
+
+    X = df.drop(columns=["label"])
+    y = df["label"]
+    dropped_features = [col for col in drops if col in set(df.columns)]
+    X.drop(columns=dropped_features, inplace=True)
+    assert len(list(X)) > 0, "Unable to use empty data frame"
+
+    return X, y
 
 
 def print_stats(data):
@@ -94,16 +102,9 @@ def save_feature_importance(data):
 
 
 def run(model_name, csv_path, balancing=None, fraction=None, drops=()):
-    data = load_dataset(csv_path, fraction=fraction)
+    X, y = load_dataset(fpath=csv_path, drops=drops, fraction=fraction)
 
     # Train(80%) Test (20%) split
-    X = data.drop(columns=["label"])
-    y = data["label"]
-
-    dropped_features = [col for col in drops if col in set(data.columns)]
-    X.drop(columns=dropped_features, inplace=True)
-    assert len(list(X)) > 0, "Unable to use empty data frame"
-
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=RANDOM_SEED, stratify=y, shuffle=True
     )
