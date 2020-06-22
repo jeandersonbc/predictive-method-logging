@@ -18,16 +18,15 @@ RANDOM_SEED = 2357
 warnings.warn = lambda *args, **kwargs: None
 
 
-# TODO frac should be read from command line
-def load_dataset(fpath, remove_noise=False, frac=None):
+def load_dataset(fpath, remove_noise=False, fraction=None):
     df = pd.read_csv(fpath)
     if remove_noise:
         df = df[~(df["logStatementsQty_orig"] > 0)]
     df.set_index(["file", "class", "method"], inplace=True)
     df = df.drop(columns=["logStatementsQty_orig"])
     # Dataset reduction to for dev purposes
-    if frac:
-        df = df.sample(frac=frac, random_state=RANDOM_SEED)
+    if fraction:
+        df = df.sample(frac=fraction, random_state=RANDOM_SEED)
     return df
 
 
@@ -94,8 +93,8 @@ def save_feature_importance(data):
     pd.DataFrame.from_dict(as_dict).to_csv("feature_importance.csv", index=False)
 
 
-def run(model_name, csv_path, balancing=None):
-    data = load_dataset(csv_path)
+def run(model_name, csv_path, balancing=None, fraction=None):
+    data = load_dataset(csv_path, fraction=fraction)
 
     # Train(80%) Test (20%) split
     X = data.drop(columns=["label"])
