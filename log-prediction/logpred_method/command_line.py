@@ -9,11 +9,21 @@ def main():
     parser.add_argument("csv_path")
     parser.add_argument("--balancing", default=None, choices="smote rus".split(" "))
     parser.add_argument("--fraction", default=None, type=float)
+    parser.add_argument("--drops", default=[], nargs="+")
     args = parser.parse_args()
 
     model_name = args.model_name
     csv_path = args.csv_path
     balancing = args.balancing
     fraction = args.fraction
+    drops = args.drops
 
-    logpred_method.run(model_name=model_name, csv_path=csv_path, balancing=balancing, fraction=fraction)
+    print(args)
+
+    logpred_method.run(
+        model_name=model_name,
+        csv_path=csv_path,
+        balancing=balancing,
+        fraction=fraction,
+        drops=drops,
+    )

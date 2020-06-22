@@ -93,12 +93,17 @@ def save_feature_importance(data):
     pd.DataFrame.from_dict(as_dict).to_csv("feature_importance.csv", index=False)
 
 
-def run(model_name, csv_path, balancing=None, fraction=None):
+def run(model_name, csv_path, balancing=None, fraction=None, drops=()):
     data = load_dataset(csv_path, fraction=fraction)
 
     # Train(80%) Test (20%) split
     X = data.drop(columns=["label"])
     y = data["label"]
+
+    dropped_features = [col for col in drops if col in set(data.columns)]
+    X.drop(columns=dropped_features, inplace=True)
+    assert len(list(X)) > 0, "Unable to use empty data frame"
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=RANDOM_SEED, stratify=y, shuffle=True
     )
