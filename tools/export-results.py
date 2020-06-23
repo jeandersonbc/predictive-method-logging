@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-import os
 import json
-
+import os
 from sys import argv
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def float_formatter(value):
@@ -15,14 +14,11 @@ def float_formatter(value):
     return value
 
 
-def export_scores(results_path):
+def export_scores(results_path, fn):
     scores = []
-    for root, _, files in os.walk(results_path):
-        for f in files:
-            if f == "score.json":
-                json_path = os.path.join(root, f)
-                with open(json_path) as data:
-                    scores.append(json.loads(data.read()))
+    for target_path in find_files(results_path, "score.json", fn):
+        with open(target_path) as data:
+            scores.append(json.loads(data.read()))
 
     merged_score = {}
     for key in scores[0].keys():
@@ -31,18 +27,27 @@ def export_scores(results_path):
         for k, v in score.items():
             merged_score[k].append(v)
 
-    print(
-        pd.DataFrame(merged_score).to_latex(index=False, float_format=float_formatter)
+    frame = (
+        pd.DataFrame(merged_score)
+        .sort_values(by=["model", "balancing"])
+        .set_index(["model", "balancing"])
     )
+    print(frame.to_latex(float_format=float_formatter))
 
 
-def export_feature_importance(results_path):
-    feature_importance = {}
-    for root, _, files in os.walk(results_path):
+def find_files(base_dir, target_file, matcher):
+    for root, _, files in os.walk(base_dir):
         for f in files:
-            if f == "feature_importance.csv":
-                csv = os.path.join(root, f)
-                feature_importance[os.path.basename(root)] = pd.read_csv(csv)
+            target_path = os.path.join(root, f)
+            if f == target_file and matcher(target_path):
+                yield target_path
+
+
+def export_feature_importance(results_path, fn):
+    feature_importance = {}
+    for target_path in find_files(results_path, "feature_importance.csv", fn):
+        root = os.path.basename(os.path.dirname(target_path))
+        feature_importance[os.path.basename(root)] = pd.read_csv(target_path)
 
     for k, v in feature_importance.items():
         print(k)
@@ -61,8 +66,15 @@ def export_feature_importance(results_path):
     )
 
 
-if __name__ == "__main__":
+def main():
     project_name = argv[1]
     results_path = os.path.abspath(os.path.join("out", "ml", project_name))
-    export_scores(results_path)
-    export_feature_importance(results_path)
+    export_scores(results_path, fn=lambda e: "trycatch" not in e)
+    export_feature_importance(results_path, fn=lambda e: "trycatch" not in e)
+    print("Try-catch removed")
+    export_scores(results_path, fn=lambda e: "trycatch" in e)
+    export_feature_importance(results_path, fn=lambda e: "trycatch" in e)
+
+
+if __name__ == "__main__":
+    main()
