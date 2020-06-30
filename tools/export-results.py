@@ -66,14 +66,48 @@ def export_feature_importance(results_path, fn):
     )
 
 
+def export_feature_importance_v2(results_path, fn):
+    feature_importance = {}
+    for target_path in find_files(results_path, "feature_importance.csv", fn):
+        root = os.path.basename(os.path.dirname(target_path))
+        feature_importance[os.path.basename(root)] = pd.read_csv(target_path)
+
+    counting = {}
+    n = 5
+    for k, v in feature_importance.items():
+        print(k)
+        print(v.head(n))
+        for pos, f in v.head(n)["feature"].items():
+            if f not in counting.keys():
+                counting[f] = [0 for cnt in range(n)]
+            counting[f][pos] += 1
+
+    print(r"\midrule")
+    for k, v in sorted(counting.items(), key=lambda item: sum(item[1]), reverse=True):
+        print(f"{k} & {sum(v)} & {' & '.join(str(e) for e in v)} \\\\")
+    print(r"\bottomrule")
+
+   #header = pd.MultiIndex.from_product(
+   #    [feature_importance.keys(), ["feature", "importance"]]
+   #)
+   #values = np.concatenate(
+   #    [v.head().values for v in feature_importance.values()], axis=1
+   #)
+   #print(
+   #    pd.DataFrame(values, columns=header).to_latex(
+   #        index=False, float_format=float_formatter
+   #    )
+   #)
+
+
 def main():
     project_name = argv[1]
     results_path = os.path.abspath(os.path.join("out", "ml", project_name))
-    export_scores(results_path, fn=lambda e: "trycatch" not in e)
-    export_feature_importance(results_path, fn=lambda e: "trycatch" not in e)
+
     print("Try-catch removed")
-    export_scores(results_path, fn=lambda e: "trycatch" in e)
-    export_feature_importance(results_path, fn=lambda e: "trycatch" in e)
+    #export_scores(results_path, fn=lambda e: "trycatch" in e)
+    #export_feature_importance(results_path, fn=lambda e: "trycatch" in e)
+    export_feature_importance_v2(results_path, fn=lambda e: "trycatch" in e)
 
 
 if __name__ == "__main__":
