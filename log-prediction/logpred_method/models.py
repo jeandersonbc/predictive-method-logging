@@ -106,7 +106,7 @@ def create_pipeline(categ_cols, model_param, balancing=None):
         pipeline = Pipeline(steps=pipeline_steps)
     elif balancing in {"smote", "rus"}:
         sampler = RandomUnderSampler(random_state=RANDOM_SEED)
-        if balancing == "rus":
+        if balancing == "smote":
             sampler = SMOTE(random_state=RANDOM_SEED)
         pipeline_steps.insert(1, ("sampler", sampler))
         pipeline = ImbPipeline(steps=pipeline_steps)
