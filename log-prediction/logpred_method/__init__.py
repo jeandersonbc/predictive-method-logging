@@ -101,7 +101,14 @@ def save_feature_importance(data):
     pd.DataFrame.from_dict(as_dict).to_csv("feature_importance.csv", index=False)
 
 
-def run(model_name, csv_path, balancing=None, fraction=None, drops=()):
+def run(
+    model_name: str,
+    csv_path: str,
+    balancing: str = None,
+    fraction=None,
+    drops=(),
+    tuning_enabled: bool = True,
+):
     X, y = load_dataset(fpath=csv_path, drops=drops, fraction=fraction)
 
     # Train(80%) Test (20%) split
@@ -124,32 +131,40 @@ def run(model_name, csv_path, balancing=None, fraction=None, drops=()):
     pipe, params = create_pipeline(categ_cols, model_name, balancing)
 
     # Hyper-parameter tuning
-    search = RandomizedSearchCV(
-        estimator=pipe,
-        param_distributions=params,
-        n_iter=10,
-        scoring="balanced_accuracy",
-        cv=5,
-        random_state=RANDOM_SEED,
-    )
-    print(search)
+
+    estimator = pipe
+    if tuning_enabled:
+        estimator = RandomizedSearchCV(
+            estimator=pipe,
+            param_distributions=params,
+            n_iter=10,
+            scoring="balanced_accuracy",
+            cv=5,
+            random_state=RANDOM_SEED,
+        )
+
+    print(estimator)
 
     # Training
-    search.fit(X_train, y_train)
-
-    print("Best params", pd.Series(search.best_params_), sep="\n")
-    cv_results_best = pd.DataFrame.from_dict(search.cv_results_).loc[search.best_index_]
-    print(cv_results_best)
+    estimator.fit(X_train, y_train)
 
     # Prediction
-    pred = search.predict(X_test)
+    pred = estimator.predict(X_test)
 
     # Score
     score = make_score(y_test, pred)
-    score["mean_fit_time"] = cv_results_best["mean_fit_time"]
-    score["std_fit_time"] = cv_results_best["std_fit_time"]
-    score["mean_test_score"] = cv_results_best["mean_test_score"]
-    score["std_test_score"] = cv_results_best["std_test_score"]
+
+    if tuning_enabled:
+        print("Best params", pd.Series(estimator.best_params_), sep="\n")
+        cv_results_best = pd.DataFrame.from_dict(estimator.cv_results_).loc[
+            estimator.best_index_
+        ]
+        print(cv_results_best)
+
+        score["mean_fit_time"] = cv_results_best["mean_fit_time"]
+        score["std_fit_time"] = cv_results_best["std_fit_time"]
+        score["mean_test_score"] = cv_results_best["mean_test_score"]
+        score["std_test_score"] = cv_results_best["std_test_score"]
 
     # Unpacks numpy data types
     score = {k: v.item() for k, v in score.items()}
@@ -160,8 +175,9 @@ def run(model_name, csv_path, balancing=None, fraction=None, drops=()):
     print("SCORE:", score)
 
     # Feature Importance
-    pipe = search.best_estimator_
-    fi = extract_feature_importance(pipe, categ_cols, num_cols)
+    fi = extract_feature_importance(
+        estimator.best_estimator_ if tuning_enabled else estimator, categ_cols, num_cols
+    )
     for f, i in fi[:5]:
         print(f, i)
     save_feature_importance(fi)
