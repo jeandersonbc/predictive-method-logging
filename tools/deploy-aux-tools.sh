@@ -6,5 +6,5 @@ for f in 'log-remover' 'log-placement-analyzer'; do
 done
 
 pushd log-prediction || exit 1
-./build.sh
+pip3 install .
 popd

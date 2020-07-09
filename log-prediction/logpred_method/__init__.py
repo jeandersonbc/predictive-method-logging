@@ -18,10 +18,15 @@ RANDOM_SEED = 2357
 warnings.warn = lambda *args, **kwargs: None
 
 
-def load_dataset(fpath, drops=(), remove_noise=False, fraction=None):
+def load_dataset(fpath: str, drops=(), fraction=None):
+    """
+    Loads the dataset from the given fpath location and return the train-test-split
+    :param fpath: Path to the dataset
+    :param drops: list of features to drop
+    :param fraction: reduces the dataset to the given fraction
+    :return: X_train, X_test, y_train, y_test.
+    """
     df = pd.read_csv(fpath)
-    if remove_noise:
-        df = df[~(df["logStatementsQty_orig"] > 0)]
     df.set_index(["file", "class", "method"], inplace=True)
     df = df.drop(columns=["logStatementsQty_orig"])
 
@@ -35,7 +40,10 @@ def load_dataset(fpath, drops=(), remove_noise=False, fraction=None):
     X.drop(columns=dropped_features, inplace=True)
     assert len(list(X)) > 0, "Unable to use empty data frame"
 
-    return X, y
+    # Train(80%) Test (20%) split
+    return train_test_split(
+        X, y, test_size=0.2, random_state=RANDOM_SEED, stratify=y, shuffle=True
+    )
 
 
 def print_stats(data):
@@ -63,9 +71,9 @@ def make_score(y_test, pred):
     }
 
 
-def extract_feature_importance(pipe, categ, numerical):
-    clf = pipe.named_steps["clf"]
-    transformer = pipe.named_steps["transformer"]
+def extract_feature_importance(pipeline, categ, numerical):
+    clf = pipeline.named_steps["clf"]
+    transformer = pipeline.named_steps["transformer"]
 
     importances = None
     # Regression-like algorithms
@@ -109,11 +117,8 @@ def run(
     drops=(),
     tuning_enabled: bool = True,
 ):
-    X, y = load_dataset(fpath=csv_path, drops=drops, fraction=fraction)
-
-    # Train(80%) Test (20%) split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=RANDOM_SEED, stratify=y, shuffle=True
+    X_train, X_test, y_train, y_test = load_dataset(
+        fpath=csv_path, drops=drops, fraction=fraction
     )
     train_test_info = {
         "train_n": X_train.shape[0],
@@ -123,8 +128,9 @@ def run(
     }
     print(pd.Series(train_test_info))
 
-    categ_cols = list(X.dtypes[~(X.dtypes == "int64")].index)
-    num_cols = list(X.dtypes[X.dtypes == "int64"].index)
+    is_numerical = X_train.dtypes == "int64"
+    categ_cols = list(X_train.dtypes[~is_numerical].index)
+    num_cols = list(X_train.dtypes[is_numerical].index)
     print("qualitative:", len(categ_cols), categ_cols)
     print("quantitative:", len(num_cols), num_cols)
 
@@ -175,9 +181,10 @@ def run(
     print("SCORE:", score)
 
     # Feature Importance
-    fi = extract_feature_importance(
-        estimator.best_estimator_ if tuning_enabled else estimator, categ_cols, num_cols
-    )
+    trained_model = estimator.best_estimator_ if tuning_enabled else estimator
+    fi = extract_feature_importance(trained_model, categ_cols, num_cols)
     for f, i in fi[:5]:
         print(f, i)
     save_feature_importance(fi)
+
+    return trained_model, score, fi
