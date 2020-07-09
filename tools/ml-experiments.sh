@@ -10,6 +10,9 @@ if [ ! -f "$DATASET_CSV" ]; then
 fi
 
 
+# This experiment is not executed as it includes all fetures from the dataset
+# including trycatches. You can run both experiments to assess the differences
+# in the output metrics.
 run_standard_experiments() {
   local output_base="$BASEDIR/out/ml/$PROJECT_NAME"
 
@@ -63,5 +66,5 @@ run_trycatch_experiments() {
   done
 }
 
-time run_standard_experiments
+
 time run_trycatch_experiments

@@ -103,7 +103,7 @@ ml_experiment() {
   find "$SELECTION_DIR" -type f -path '*.sh' |
     while read -r subject; do
       echo Running "$subject"
-      time "$TOOLS_DIR/ml-experiments.sh" "$subject"
+      time "$TOOLS_DIR/ml-experiments.sh" "$(basename "$subject" | sed 's/.sh//')"
     done
   echo Done DATASET step
 }
