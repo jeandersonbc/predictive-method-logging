@@ -6,7 +6,7 @@ from sklearn.metrics import (
     confusion_matrix,
     precision_score,
     recall_score,
-    roc_auc_score,
+    balanced_accuracy_score,
 )
 from sklearn.model_selection import RandomizedSearchCV, train_test_split
 
@@ -54,7 +54,7 @@ def make_score(y_test, pred):
     return {
         "prec": precision_score(y_test, pred),
         "recall": recall_score(y_test, pred),
-        "roc_auc": roc_auc_score(y_test, pred),
+        "acc": balanced_accuracy_score(y_test, pred),
         "tn": tn,
         "fp": fp,
         "fn": fn,
@@ -123,12 +123,12 @@ def run(model_name, csv_path, balancing=None, fraction=None, drops=()):
 
     pipe, params = create_pipeline(categ_cols, model_name, balancing)
 
-    # Hyper-parameter tunning
+    # Hyper-parameter tuning
     search = RandomizedSearchCV(
         estimator=pipe,
         param_distributions=params,
         n_iter=10,
-        scoring="roc_auc",
+        scoring="balanced_accuracy",
         cv=5,
         random_state=RANDOM_SEED,
     )
