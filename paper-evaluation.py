@@ -14,8 +14,7 @@ from sklearn.model_selection import train_test_split
 
 
 # Use "FRACTION = None" for full dataset
-FRACTION: float = None 
-
+FRACTION: float = None
 
 # lr: Linear Regression
 # ab: Ada Boost
@@ -69,7 +68,8 @@ X_adyen_train, X_adyen_test, y_adyen_train, y_adyen_test = train_test_split(
 )
 
 output_dir = os.path.abspath(os.path.join("out", "ml", "evaluation"))
-shutil.rmtree(output_dir)
+if os.path.exists(output_dir):
+    shutil.rmtree(output_dir)
 os.makedirs(output_dir)
 
 
@@ -359,6 +359,10 @@ results_rq4 = pd.DataFrame.from_dict(
     merge_scores(
         rq4_scores_all + rq4_scores_individual
     )
+)
+results_rq4.to_csv(
+    os.path.join(output_dir, "rq4.csv"),
+    index=False
 )
 results_rq4.drop(columns=["model", "balancing"]).sort_values(by="prec recall acc".split(" "), ascending=False)
 
