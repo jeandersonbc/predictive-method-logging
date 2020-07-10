@@ -1,5 +1,7 @@
 import argparse
 
+from sklearn.model_selection import train_test_split
+
 import logpred_method
 
 
@@ -20,10 +22,21 @@ def main():
 
     print(args)
 
+    X, y = logpred_method.load_dataset(fpath=csv_path, drops=drops, fraction=fraction)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.2,
+        random_state=logpred_method.RANDOM_SEED,
+        stratify=y,
+        shuffle=True,
+    )
+
     logpred_method.run(
         model_name=model_name,
-        csv_path=csv_path,
+        X_train=X_train,
+        X_test=X_test,
+        y_train=y_train,
+        y_test=y_test,
         balancing=balancing,
-        fraction=fraction,
-        drops=drops,
     )

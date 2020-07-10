@@ -7,7 +7,7 @@ from sklearn.metrics import (
     recall_score,
     balanced_accuracy_score,
 )
-from sklearn.model_selection import RandomizedSearchCV, train_test_split
+from sklearn.model_selection import RandomizedSearchCV
 
 from logpred_method.models import create_pipeline
 
@@ -19,11 +19,11 @@ warnings.warn = lambda *args, **kwargs: None
 
 def load_dataset(fpath: str, drops=(), fraction=None):
     """
-    Loads the dataset from the given fpath location and return the train-test-split
+    Loads the dataset from the given fpath location and returns the X, y pair.
     :param fpath: Path to the dataset
     :param drops: list of features to drop
     :param fraction: reduces the dataset to the given fraction
-    :return: X_train, X_test, y_train, y_test.
+    :return: X, y
     """
     df = pd.read_csv(fpath)
     df.set_index(["file", "class", "method"], inplace=True)
@@ -39,10 +39,7 @@ def load_dataset(fpath: str, drops=(), fraction=None):
     X.drop(columns=dropped_features, inplace=True)
     assert len(list(X)) > 0, "Unable to use empty data frame"
 
-    # Train(80%) Test (20%) split
-    return train_test_split(
-        X, y, test_size=0.2, random_state=RANDOM_SEED, stratify=y, shuffle=True
-    )
+    return X, y
 
 
 def print_stats(data):
@@ -113,16 +110,14 @@ class Output(object):
 
 def run(
     model_name: str,
-    csv_path: str,
+    X_train,
+    X_test,
+    y_train,
+    y_test,
     balancing: str = None,
-    fraction=None,
-    drops=(),
     tuning_enabled: bool = True,
     output_to: str = None,
 ):
-    X_train, X_test, y_train, y_test = load_dataset(
-        fpath=csv_path, drops=drops, fraction=fraction
-    )
     train_test_info = {
         "train_n": X_train.shape[0],
         "train_ratio": y_train.mean() * 100,
