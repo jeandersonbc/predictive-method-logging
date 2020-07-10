@@ -1,4 +1,3 @@
-import json
 import warnings
 
 import pandas as pd
@@ -96,17 +95,20 @@ def extract_feature_importance(pipeline, categ, numerical):
     ]
 
 
-def save_score(score):
-    with open("score.json", "w") as f:
-        json.dump(score, f)
+class Output(object):
+    def __init__(self, fpath=None):
+        self.fpath = fpath
+        if self.fpath is not None:
+            with open(self.fpath, "w") as f:
+                f.write("")
 
-
-def save_feature_importance(data):
-    as_dict = {"feature": [], "importance": []}
-    for (ftr, imp) in data:
-        as_dict["feature"].append(ftr)
-        as_dict["importance"].append(imp)
-    pd.DataFrame.from_dict(as_dict).to_csv("feature_importance.csv", index=False)
+    def print(self, *args):
+        if self.fpath is None:
+            print(*args)
+            return
+        with open(self.fpath, "a") as f:
+            f.writelines([str(e) for e in args])
+            f.write("\n")
 
 
 def run(
@@ -116,6 +118,7 @@ def run(
     fraction=None,
     drops=(),
     tuning_enabled: bool = True,
+    output_to: str = None,
 ):
     X_train, X_test, y_train, y_test = load_dataset(
         fpath=csv_path, drops=drops, fraction=fraction
@@ -126,13 +129,14 @@ def run(
         "test_n": X_test.shape[0],
         "test_ratio": y_test.mean() * 100,
     }
-    print(pd.Series(train_test_info))
+    out = Output(output_to)
+    out.print(pd.Series(train_test_info))
 
     is_numerical = X_train.dtypes == "int64"
     categ_cols = list(X_train.dtypes[~is_numerical].index)
     num_cols = list(X_train.dtypes[is_numerical].index)
-    print("qualitative:", len(categ_cols), categ_cols)
-    print("quantitative:", len(num_cols), num_cols)
+    out.print("qualitative:", len(categ_cols), categ_cols)
+    out.print("quantitative:", len(num_cols), num_cols)
 
     pipe, params = create_pipeline(categ_cols, model_name, balancing)
 
@@ -149,7 +153,7 @@ def run(
             random_state=RANDOM_SEED,
         )
 
-    print(estimator)
+    out.print(estimator)
 
     # Training
     estimator.fit(X_train, y_train)
@@ -161,11 +165,11 @@ def run(
     score = make_score(y_test, pred)
 
     if tuning_enabled:
-        print("Best params", pd.Series(estimator.best_params_), sep="\n")
         cv_results_best = pd.DataFrame.from_dict(estimator.cv_results_).loc[
             estimator.best_index_
         ]
-        print(cv_results_best)
+        out.print("Best params", pd.Series(estimator.best_params_))
+        out.print(cv_results_best)
 
         score["mean_fit_time"] = cv_results_best["mean_fit_time"]
         score["std_fit_time"] = cv_results_best["std_fit_time"]
@@ -177,14 +181,12 @@ def run(
 
     score["model"] = model_name
     score["balancing"] = balancing if balancing is not None else "-"
-    save_score(score)
-    print("SCORE:", score)
+    out.print("SCORE:", score)
 
     # Feature Importance
     trained_model = estimator.best_estimator_ if tuning_enabled else estimator
     fi = extract_feature_importance(trained_model, categ_cols, num_cols)
     for f, i in fi[:5]:
-        print(f, i)
-    save_feature_importance(fi)
+        out.print(f, i)
 
     return trained_model, score, fi
