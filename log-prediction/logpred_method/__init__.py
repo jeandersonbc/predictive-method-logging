@@ -1,11 +1,12 @@
 import warnings
+from time import time
 
 import pandas as pd
 from sklearn.metrics import (
+    balanced_accuracy_score,
     confusion_matrix,
     precision_score,
     recall_score,
-    balanced_accuracy_score,
 )
 from sklearn.model_selection import RandomizedSearchCV
 
@@ -151,10 +152,14 @@ def run(
     out.print(estimator)
 
     # Training
+    time_initial = time()
     estimator.fit(X_train, y_train)
+    out.print(f"fit time={time() - time_initial:.2f}s")
 
     # Prediction
+    time_initial = time()
     pred = estimator.predict(X_test)
+    out.print(f"prediction time={time() - time_initial:.2f}s")
 
     # Score
     score = make_score(y_test, pred)
