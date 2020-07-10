@@ -92,26 +92,9 @@ create_dataset() {
   echo Done DATASET step
 }
 
-ml_experiment() {
-  echo Running MACHINE LEARNING step
-  if [[ ! -d "$SELECTION_DIR" ]]; then
-    echo Missing SELECTION dir. Did you run the run-selection script?
-    echo Aborting
-    exit 1
-  fi
-
-  find "$SELECTION_DIR" -type f -path '*.sh' |
-    while read -r subject; do
-      echo Running "$subject"
-      time "$TOOLS_DIR/ml-experiments.sh" "$(basename "$subject" | sed 's/.sh//')"
-    done
-  echo Done DATASET step
-}
-
 # main
 time analysis
 time selection
 time log_removal
 time code_metrics
 time create_dataset
-time ml_experiment
