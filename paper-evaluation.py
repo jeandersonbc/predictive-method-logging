@@ -317,9 +317,7 @@ assert sum([X.shape[0] for X, _ in APACHE_PROJECTS.values()]) == X_apache_all.sh
 X_apache_all.shape
 
 
-# ## Learning from Projects Individually
-
-# In[17]:
+# In[ ]:
 
 
 def rq4():
@@ -332,7 +330,7 @@ def rq4():
         y_train=y_apache_all,
         y_test=y_adyen_test,
         output_to=os.path.join(output_dir, f"rq4-{model}-apache-all.log"),
-        tuning_enabled=False
+        tuning_enabled=True
     )
     estimator, score, fi = out
     score["project"] = "apache-all"
@@ -350,9 +348,43 @@ def rq4():
 rq4_scores_all = rq4()
 
 
+# ## Learning from Projects Individually
+
+# In[ ]:
+
+
+def rq4_individual():
+    scores = []
+    model = "rf"
+    for project, Xy in APACHE_PROJECTS.items():
+        out = experiment.run(
+            model,
+            X_train=Xy[0].drop(columns=["type"]),
+            X_test=X_adyen_test.drop(columns=["type"]),
+            y_train=Xy[1].drop(columns=["type"]),
+            y_test=y_adyen_test.drop(columns=["type"]),
+            output_to=os.path.join(output_dir, f"rq4-{model}-{project}.log"),
+            tuning_enabled=True
+        )
+        estimator, score, fi = out
+        score["project"] = project
+        score["training_size"] = Xy[0].shape[0]
+        scores.append(score)
+
+        # Save to the global state this run
+        key = f"{model}-{project}"
+        ESTIMATORS[key] = estimator
+        FEATURE_IMPORTANCES[key] = fi
+
+    return scores
+
+
+rq4_scores_individual = rq4_individual()
+
+
 # ## Results
 
-# In[25]:
+# In[ ]:
 
 
 results_rq4 = pd.DataFrame.from_dict(
