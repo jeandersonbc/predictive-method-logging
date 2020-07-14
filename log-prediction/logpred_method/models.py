@@ -96,10 +96,15 @@ def create_pipeline(categ_cols, model_param, balancing=None):
         raise Exception(f"Unkown parameter {model_param}")
 
     # Common pipeline steps
-    column_transformer = make_column_transformer(
-        (OneHotEncoder(), categ_cols), remainder="passthrough"
-    )
-    pipeline_steps = [("transformer", column_transformer), ("clf", model)]
+    pipeline_steps = []
+
+    if len(categ_cols):
+        column_transformer = make_column_transformer(
+            (OneHotEncoder(), categ_cols), remainder="passthrough"
+        )
+        pipeline_steps.append(("transformer", column_transformer))
+
+    pipeline_steps.append(("clf", model))
 
     # Actual pipeline instantiation
     if balancing is None:
@@ -108,7 +113,8 @@ def create_pipeline(categ_cols, model_param, balancing=None):
         sampler = RandomUnderSampler(random_state=RANDOM_SEED)
         if balancing == "smote":
             sampler = SMOTE(random_state=RANDOM_SEED)
-        pipeline_steps.insert(1, ("sampler", sampler))
+        # sampler is always one step before the transformer
+        pipeline_steps.insert(-1, ("sampler", sampler))
         pipeline = ImbPipeline(steps=pipeline_steps)
     else:
         raise Exception(f"Unknown balancing {balancing}")
