@@ -72,13 +72,13 @@ def extract_feature_importance(pipeline, categ, numerical):
     clf = pipeline.named_steps["clf"]
     transformer = pipeline.named_steps["transformer"]
 
-    importances = None
+    importance = None
     # Regression-like algorithms
     if hasattr(clf, "coef_"):
-        importances = clf.coef_[0]
+        importance = clf.coef_[0]
     # Tree-based algorithms
     if hasattr(clf, "feature_importances_"):
-        importances = clf.feature_importances_
+        importance = clf.feature_importances_
 
     feature_names = []
     categ_encoder = transformer.named_transformers_["onehotencoder"]
@@ -88,7 +88,7 @@ def extract_feature_importance(pipeline, categ, numerical):
     return [
         (f, i)
         for f, i in sorted(
-            zip(feature_names, importances), key=lambda fi: fi[1], reverse=True
+            zip(feature_names, importance), key=lambda fi: fi[1], reverse=True
         )
     ]
 
