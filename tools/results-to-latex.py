@@ -26,11 +26,9 @@ print(
     )
 )
 print(
-    (
-        rq1["prec recall acc".split(" ")]
-        .agg(["mean", "std"])
-        * 100
-    ).to_latex(float_format="%.1f")
+    (rq1["prec recall acc".split(" ")].agg(["mean", "std"]) * 100).to_latex(
+        float_format="%.1f"
+    )
 )
 
 print("RQ2")
