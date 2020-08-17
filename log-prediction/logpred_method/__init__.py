@@ -27,8 +27,11 @@ def load_dataset(fpath: str, drops=(), fraction=None):
     :return: X, y
     """
     df = pd.read_csv(fpath)
-    df.set_index(["file", "class", "method"], inplace=True)
-    df = df.drop(columns=["logStatementsQty_orig"])
+    index = ["file", "class", "method"]
+    if all([e in set(df.columns) for e in index]):
+        df.set_index(index, inplace=True)
+    if "logStatementsQty_orig" in set(df.columns):
+        df = df.drop(columns=["logStatementsQty_orig"])
 
     # Dataset reduction to for dev purposes
     if fraction:
@@ -38,7 +41,10 @@ def load_dataset(fpath: str, drops=(), fraction=None):
     y = df["label"]
     dropped_features = [col for col in drops if col in set(df.columns)]
     X.drop(columns=dropped_features, inplace=True)
-    assert len(list(X)) > 0, "Unable to use empty data frame"
+    expected_cols = 63
+    assert (
+        len(list(X)) == expected_cols
+    ), f"Expected {expected_cols} but got {len(list(X))}"
 
     return X, y
 
