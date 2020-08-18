@@ -26,7 +26,7 @@ Getting started is easy as 1, 2, 3:
 
 
 Some Python scripts depends on the dependencies installed from Step 1 (e.g., Pandas and Numpy) to analyze intermediate data during experimentation.
-Step 3 will download 64 Apache projects from [a CSV file](https://github.com/jeandersonbc/predictive-method-logging/blob/master/apache-projects.csv) into a `apache-downloads` dir. Also, it will generate a `apache-projects` dir with scripts that exports the absolute path and revision of a given project.
+Step 3 will download 64 Apache projects from [a CSV file](./apache-projects.csv) into a `apache-downloads` dir. Also, it will generate a `apache-projects` dir with scripts that exports the absolute path and revision of a given project.
 
 #### Hello World
 
