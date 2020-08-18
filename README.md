@@ -13,6 +13,9 @@ Learning whether a method should be logged or not based on code metrics.
 
 ## Getting Started
 
+> We highly recommend you to create a Python virtual environment before starting!
+>   * `python3 -m venv .venv && source .venv/bin/activate`
+
 Getting started is easy as 1, 2, 3:
 
 | Step | What | How |
