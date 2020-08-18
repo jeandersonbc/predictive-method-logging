@@ -41,10 +41,7 @@ def load_dataset(fpath: str, drops=(), fraction=None):
     y = df["label"]
     dropped_features = [col for col in drops if col in set(df.columns)]
     X.drop(columns=dropped_features, inplace=True)
-    expected_cols = 63
-    assert (
-        len(list(X)) == expected_cols
-    ), f"Expected {expected_cols} but got {len(list(X))}"
+    assert len(list(X)) > 0, "Dataframe is empty"
 
     return X, y
 
