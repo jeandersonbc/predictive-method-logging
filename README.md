@@ -4,17 +4,24 @@ Predictive Method Logging
 
 Learning whether a method should be logged or not based on code metrics.
 
-## Minimum requirements:
+## Minimum requirements
 * Bash environment to run scripts
 * Java >= 8.0
 * Python >= 3.6 with pip available
 
-**Important:** _The subject selection step in our experiments relies on a `R` script with the `dplyr` package available. This is only required if you are interested in replicating our study or trying different selection criteria._
+The subject selection step in our experiments relies on a `R` script with the `dplyr` package available. This is only required if you are interested in replicating our study or trying different selection criteria.
+
+## Important
+
+* We highly recommend you to create a Python virtual environment before starting:
+  * `python3 -m venv .venv && source .venv/bin/activate`
+
+* _"Where is the dataset?"_
+  * Raw data is not provided for practical reasons; however, the process to generate and analyze data is fully automated.
+  * Source files and data related to our industry partner is confidential and unavailable.
+
 
 ## Getting Started
-
-> We highly recommend you to create a Python virtual environment before starting!
->   * `python3 -m venv .venv && source .venv/bin/activate`
 
 Getting started is easy as 1, 2, 3:
 
