@@ -13,7 +13,7 @@ The subject selection step in our experiments relies on a `R` script with the `d
 
 ## Important
 
-* We highly recommend you to create a Python virtual environment before starting:
+* We highly recommend you to create a Python virtual environment in your working directory before starting:
   * `python3 -m venv .venv && source .venv/bin/activate`
 
 * _"Where is the dataset?"_
