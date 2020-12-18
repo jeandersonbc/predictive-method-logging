@@ -80,7 +80,7 @@ def plot_distribution(dist, output):
     print(description)
 
     fig, ax = plt.subplots(dpi=300)
-    sns.violinplot(data, color="aliceblue", ax=ax, cut=0)
+    sns.violinplot(data=data, color="aliceblue", ax=ax, cut=0)
     ax.set_aspect(2)
 
     fontsize = 12
@@ -126,7 +126,10 @@ def main(csv_file):
     analyze_trycatch_ifelse(dist)
 
     print("Latex table (paper purposes)")
-    print(dist.to_latex())
+    print(dist.to_latex(formatters={
+        "perc": lambda e: f"{round(e):,d}",
+        "count": lambda e: f"{e:,d}",
+    }))
 
     print("Distribution of log statements per method")
     dist_stmts = compute_logstmts_per_method_dist(df)
