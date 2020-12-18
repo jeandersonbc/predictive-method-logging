@@ -1,4 +1,4 @@
-package nl.tudelft.serg;
+package experiment.component;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;

@@ -1,4 +1,4 @@
-package nl.tudelft.serg;
+package experiment.component;
 
 public class LogIdentifier {
 

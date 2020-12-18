@@ -1,4 +1,4 @@
-package nl.tudelft.serg;
+package experiment.component;
 
 import org.eclipse.jdt.core.dom.*;
 

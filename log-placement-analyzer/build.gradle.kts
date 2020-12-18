@@ -12,7 +12,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "nl.tudelft.serg.App"
+    mainClassName = "experiment.component.App"
 }
 
 java {
