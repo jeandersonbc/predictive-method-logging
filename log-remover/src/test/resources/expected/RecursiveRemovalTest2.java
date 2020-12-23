@@ -7,6 +7,9 @@ class Foo {
             existingData = !confParamOps.list(domain).isEmpty();
         } catch (Exception e) {
         }
+        if (someCondition) {
+            anotherMethodCall();
+        }
     }
 
 }

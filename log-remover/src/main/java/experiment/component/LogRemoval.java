@@ -1,9 +1,11 @@
-package nl.tudelft.serg;
+package experiment.component;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 
@@ -19,8 +21,7 @@ public class LogRemoval {
                 Optional<Node> parent = n.getParentNode();
                 if (parent.isPresent() && parent.get() instanceof ExpressionStmt) {
                     ExpressionStmt exprStmt = (ExpressionStmt) parent.get();
-                    String[] split = exprStmt.toString().trim().split("\n");
-                    String rawExpr = split[split.length - 1];
+                    String rawExpr = getRawLogStatementFrom(exprStmt);
                     if (LogIdentifier.isLogStatement(rawExpr)) {
                         /*
                          * We then find the first statement we can remove.
@@ -36,19 +37,76 @@ public class LogRemoval {
                          * In future work, we should try to improve our transformation algorithm.
                          */
                         Node currentNode = exprStmt;
-                        boolean result = currentNode.remove();
-                        while (!result && currentNode.getParentNode().isPresent()) {
-                            currentNode = currentNode.getParentNode().get();
-                            result = currentNode.remove();
-                        }
-                        if (!result) {
-                            System.out.println("- error in call " + exprStmt);
+                        boolean wasRemovedByGuard = removeWithLogGuard(exprStmt);
+
+                        if (!wasRemovedByGuard) {
+                            boolean result = currentNode.remove();
+                            // handles if-else expressions if (...) ... ;
+                            while (!result && currentNode.getParentNode().isPresent()) {
+                                currentNode = currentNode.getParentNode().get();
+                                result = currentNode.remove();
+                            }
+
+                            if (!result) {
+                                System.out.println("- error in call " + exprStmt);
+                            }
                         }
 
                     }
                 }
                 return super.visit(n, arg);
 
+            }
+
+            private String getRawLogStatementFrom(ExpressionStmt exprStmt) {
+                // In some occasions, the log statement is mixed with comments and makes JavaParser crazy
+                String[] logStatementMixedWithComments = exprStmt.toString().trim().split("\n");
+                return logStatementMixedWithComments[logStatementMixedWithComments.length - 1];
+            }
+
+            private boolean removeWithLogGuard(ExpressionStmt exprStmt) {
+                boolean wasRemovedByGuard = false;
+
+                // check for guard
+                Node parentNode = exprStmt;
+                IfStmt guard = null;
+                BlockStmt body = null;
+
+                int maxDepthForGuard = 2; // if + block
+                for (int i = 0; i < maxDepthForGuard && parentNode.getParentNode().isPresent(); i++) {
+                    parentNode = parentNode.getParentNode().get();
+                    if (parentNode instanceof BlockStmt) {
+                        body = (BlockStmt) parentNode;
+                    }
+                    if (parentNode instanceof IfStmt) {
+                        guard = (IfStmt) parentNode;
+                    }
+                }
+                if (guard != null && body != null) {
+                    boolean isIfAlone = !guard.hasCascadingIfStmt()
+                            && !guard.hasElseBlock()
+                            && !guard.hasElseBranch()
+                            && guard.getParentNode().isPresent()
+                            && guard.getParentNode().get() instanceof BlockStmt;
+
+                    boolean hasOnlyLogStatements = true;
+                    for (Node n : body.getChildNodes()) {
+                        if (n instanceof ExpressionStmt) {
+                            String s = getRawLogStatementFrom((ExpressionStmt) n);
+                            if (!LogIdentifier.isLogStatement(s)) {
+                                hasOnlyLogStatements = false;
+                                break;
+                            }
+                        } else {
+                            hasOnlyLogStatements = false;
+                            break;
+                        }
+                    }
+                    if (isIfAlone && hasOnlyLogStatements) {
+                        wasRemovedByGuard = guard.remove();
+                    }
+                }
+                return wasRemovedByGuard;
             }
         }, null);
         return cu.toString();

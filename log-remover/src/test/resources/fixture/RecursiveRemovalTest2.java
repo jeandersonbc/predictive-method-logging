@@ -12,5 +12,10 @@ class Foo {
         if (existingData) {
             LOG.info("[{}] Data found in Keymaster, leaving untouched", domain);
         }
+
+        if (someCondition) {
+            LOG.info("[{}] Data found in Keymaster, leaving untouched", domain);
+            anotherMethodCall();
+        }
     }
 }

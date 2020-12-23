@@ -8,7 +8,7 @@ java {
 }
 
 application {
-    mainClassName = "nl.tudelft.serg.Main"
+    mainClassName = "experiment.component.Main"
 }
 
 dependencies {

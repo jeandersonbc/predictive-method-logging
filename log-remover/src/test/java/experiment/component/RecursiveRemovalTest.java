@@ -1,10 +1,9 @@
-package nl.tudelft.serg;
+package experiment.component;
 
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileInputStream;
@@ -27,7 +26,6 @@ public class RecursiveRemovalTest {
         assertThat(actual).isEqualTo(expected.toString());
     }
 
-    @Disabled("Not supported")
     @Test
     void testCase2() {
         CompilationUnit cu = loadFixture("/fixture/RecursiveRemovalTest2.java");
@@ -42,6 +40,13 @@ public class RecursiveRemovalTest {
         String actual = remover.removeLog(cu);
         CompilationUnit expected = loadFixture("/expected/RecursiveRemovalTest3.java");
         assertThat(actual).isEqualTo(expected.toString());
+    }
+
+    @Test
+    void testCase4() {
+        CompilationUnit cu = loadFixture("/fixture/GuardRemovalExamples.java");
+        String actual = remover.removeLog(cu);
+        assertThat(actual).doesNotContain("log.warn");
     }
 
     private CompilationUnit loadFixture(String fixture) {
