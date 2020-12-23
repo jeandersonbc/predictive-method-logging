@@ -14,7 +14,7 @@ PRODUCTION <- 100
 df <- read.csv(csv_file)
 df[is.na(df)] <- 0
 
-baseline <- df %>% filter(name == "adyen-main")
+baseline <- df %>% filter(name == "baseline")
 baseline_name <- ""
 baseline_defined = (nrow(baseline) == 1)
 if (baseline_defined) {
