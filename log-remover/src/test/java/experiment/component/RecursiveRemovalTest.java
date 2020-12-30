@@ -49,6 +49,14 @@ public class RecursiveRemovalTest {
         assertThat(actual).doesNotContain("log.warn");
     }
 
+    @Test
+    void testCase5() {
+        CompilationUnit cu = loadFixture("/fixture/HelixExample.java");
+        String actual = remover.removeLog(cu);
+        CompilationUnit expected = loadFixture("/expected/HelixExample.java");
+        assertThat(actual).isEqualTo(expected.toString());
+    }
+
     private CompilationUnit loadFixture(String fixture) {
         try {
             ParserConfiguration config = StaticJavaParser.getConfiguration().setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_14);
