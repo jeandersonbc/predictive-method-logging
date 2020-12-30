@@ -9,13 +9,13 @@ def merge(dfx: pd.DataFrame, dfy: pd.DataFrame) -> pd.DataFrame:
     methods_df = dfy.drop(columns=["modifiers", "hasJavaDoc", "line"])
     return pd.merge(
         methods_df, class_df, on=["file", "class"], suffixes=("_method", "_class")
-    )
+    ).drop_duplicates()
 
 
 def prepare_labels(dfx: pd.DataFrame, labels: pd.DataFrame) -> pd.DataFrame:
     return pd.merge(
         dfx, labels, on=["file", "method", "class"], suffixes=("_orig", "_label")
-    )
+    ).drop_duplicates()
 
 
 def check_missing_points(left: pd.DataFrame, right: pd.DataFrame):
@@ -66,6 +66,7 @@ def main(argv):
     assert merged.shape[0] == nolog_method.shape[0]
 
     merged = prepare_labels(merged, labels_method)
+    assert merged.shape[0] <= nolog_method.shape[0]
 
     merged["label"] = merged["logStatementsQty_label"] > 0
     dataset_full = merged.drop(
