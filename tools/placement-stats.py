@@ -80,7 +80,7 @@ def plot_distribution(dist, output):
     print(description)
 
     fig, ax = plt.subplots(dpi=300)
-    sns.violinplot(data=data, color="aliceblue", ax=ax, cut=0)
+    sns.violinplot(data=data, color="aliceblue", ax=ax, cut=0, orient="h")
     ax.set_aspect(2)
 
     fontsize = 12
@@ -88,6 +88,8 @@ def plot_distribution(dist, output):
     plt.xticks(locs, ["$2^{%d}$" % int(d) for d in locs], fontsize=fontsize)
     ax.set_xlabel(r"Number of Log Statements [$log_2$]", fontsize=fontsize)
     ax.set_xlim((description["min"] - 0.1, description["max"] + 0.1))
+    ax.set_ylabel("")
+    ax.set(yticklabels=[])
 
     texts = [
         "  ".join(
