@@ -18,20 +18,6 @@ def prepare_labels(dfx: pd.DataFrame, labels: pd.DataFrame) -> pd.DataFrame:
     ).drop_duplicates()
 
 
-def check_missing_points(left: pd.DataFrame, right: pd.DataFrame):
-    cols = ["file", "class", "method"]
-    L = left[cols].sort_values(by=cols).reset_index()
-    R = right[cols].sort_values(by=cols).reset_index()
-    for idx, L_row in L.iterrows():
-        R_row = R.loc[idx]
-        if not L_row[cols].equals(R_row[cols]):
-            print("Missing on the removed side:")
-            print(L_row["file"])
-            print(L_row["class"])
-            print(L_row["method"])
-            return
-
-
 def main(argv):
     nolog_path = argv[1]
     copied_path = argv[2]
@@ -41,8 +27,6 @@ def main(argv):
     nolog_preffix = f".*out/log-removal/{nolog_preffix}"
     copied_preffix = "/".join(copied_path.split("/")[-2:])
     copied_preffix = f".*out/log-removal/{copied_preffix}"
-    print(f"preffix 1={nolog_preffix}")
-    print(f"preffix 2={copied_preffix}")
 
     nolog_class = pd.read_csv(os.path.join(nolog_path, "class.csv"))
     nolog_class["file"] = nolog_class["file"].apply(
@@ -58,27 +42,33 @@ def main(argv):
     labels_method["file"] = labels_method["file"].apply(
         lambda e: re.sub(copied_preffix, ".", e)
     )
-    if not labels_method.shape[0] == nolog_method.shape[0]:
-        check_missing_points(labels_method, nolog_method)
-
     # Merging, and so on...
     merged = merge(nolog_class, nolog_method)
     assert merged.shape[0] == nolog_method.shape[0]
 
     merged = prepare_labels(merged, labels_method)
-    assert merged.shape[0] <= nolog_method.shape[0]
+    assert merged.shape[0] <= nolog_method.shape[0], "Should't have more data points than expected!"
 
     merged["label"] = merged["logStatementsQty_label"] > 0
     dataset_full = merged.drop(
         columns=[c for c in list(merged) if "logStatementsQty_label" in c]
     )
     dataset_full.to_csv("dataset_full.csv", index=False)
+
+    print("Original labels (BEFORE removing logs)")
     print(
-        f"shape={dataset_full.shape}",
-        f"logged_methods={dataset_full['label'].sum()}",
-        f"noise={(dataset_full['logStatementsQty_orig'] > 0).sum()}",
-        f"missed_log_stmts={dataset_full['logStatementsQty_orig'].sum()}",
-        sep="\n",
+        f"methods={labels_method.shape[0]:,d}",
+        f"logged_methods={(labels_method['logStatementsQty'] > 0).sum():,d}",
+        f"ratio={(labels_method['logStatementsQty'] > 0).mean():.2f}",
+        f"log_statments={labels_method['logStatementsQty'].sum():,d}",
+    )
+    print("Dataset (AFTER removing logs)")
+    print(
+        f"methods={dataset_full.shape[0]:,d}",
+        f"logged_methods={dataset_full['label'].sum():,d}",
+        f"ratio={dataset_full['label'].mean():.2f}",
+        f"noise={(dataset_full['logStatementsQty_orig'] > 0).sum():,d}",
+        f"missed_log_stmts={dataset_full['logStatementsQty_orig'].sum():,d}",
     )
 
 
