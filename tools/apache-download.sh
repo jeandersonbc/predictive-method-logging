@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 DOWNLOAD_DIR="$(pwd)/apache-download"
 APACHE_PROJECTS=apache-projects
+INPUT_CSV="$1"
 
 [[ ! -d "$DOWNLOAD_DIR" ]] &&
   mkdir -p "$DOWNLOAD_DIR"
@@ -8,7 +9,7 @@ APACHE_PROJECTS=apache-projects
 rm -rf "$APACHE_PROJECTS" &&
   mkdir "$APACHE_PROJECTS"
 
-sed 's/,/ /' apache-projects.csv |
+sed 's/,/ /' "$INPUT_CSV" |
   while read -r url rev; do
 
     name="$(echo $url | sed 's/.*\///' | sed 's/\.git//')"

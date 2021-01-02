@@ -8,9 +8,15 @@ subprojects {
 }
 
 tasks.register<Exec>("fetch-apache-projects") {
-    description = "Downloads Apache projects"
+    description = "Downloads the FULL list of Apache projects"
     group = "Subjects"
-    commandLine = listOf("./tools/apache-download.sh")
+    commandLine = listOf("./tools/apache-download.sh", "apache-projects-all.csv")
+}
+
+tasks.register<Exec>("fetch-projects-paper") {
+    description = "Downloads selected Apache projects from paper"
+    group = "Subjects"
+    commandLine = listOf("./tools/apache-download.sh", "apache-projects-paper.csv")
 }
 
 tasks.register<Exec>("deploy-aux-tools") {
