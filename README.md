@@ -18,7 +18,7 @@ The subject selection step in our experiments relies on a `R` script with the `d
 
 * _"Where is the dataset?"_
   * Raw data is not provided for practical reasons; however, the process to generate and analyze data is fully automated.
-  * Source files and data related to our industry partner is confidential and unavailable.
+  * Source files and data related to our industry partner are confidential and unavailable.
 
 
 ## Getting Started
