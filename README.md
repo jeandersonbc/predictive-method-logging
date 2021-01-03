@@ -1,5 +1,6 @@
 Predictive Method Logging
 -----
+
 [![Build Status](https://travis-ci.com/jeandersonbc/predictive-method-logging.svg?token=VmF136TKUqZzBdun2K3C&branch=master)](https://travis-ci.com/jeandersonbc/predictive-method-logging)
 
 Learning whether a method should be logged or not based on code metrics.
@@ -29,11 +30,14 @@ Getting started is easy as 1, 2, 3:
 |:----:|:------------|:----|
 |1|Install the Python dependencies | `pip3 install -r requirements.txt` |
 |2| Build the project components | `./gradlew deploy-aux-tools` |
-|3| Get the initial list of Apache projects (~7Gb) | `./gradlew fetch-apache-projects` |
+|3| Get the selected list of Apache projects (~3.5 Gb) | `./gradlew fetch-projects-paper` |
 
 
 Some Python scripts depends on the dependencies installed from Step 1 (e.g., Pandas and Numpy) to analyze intermediate data during experimentation.
-Step 3 will download 64 Apache projects from [a CSV file](./apache-projects.csv) into a `apache-downloads` dir. Also, it will generate a `apache-projects` dir with scripts that exports the absolute path and revision of a given project.
+Step 3 will download 29 Apache projects from [a CSV file](./apache-projects-paper.csv) into a `apache-downloads` dir. Also, it will generate a `apache-projects` dir with scripts that exports the absolute path and revision of a given project.
+If you want to download [the initial list of all 69 Apache
+projects](./apache-projects-all.csv), run `./gradlew fetch-apache-projects` instead.
+Keep in mind that the full list contains ~7GB.
 
 #### Hello World
 
