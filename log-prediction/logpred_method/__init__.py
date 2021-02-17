@@ -121,6 +121,7 @@ def run(
     balancing: str = None,
     tuning_enabled: bool = True,
     output_to: str = None,
+    tuning_runs: int = 10,
 ):
     train_test_info = {
         "train_n": X_train.shape[0],
@@ -146,7 +147,7 @@ def run(
         estimator = RandomizedSearchCV(
             estimator=pipe,
             param_distributions=params,
-            n_iter=10,
+            n_iter=tuning_runs,
             scoring="balanced_accuracy",
             cv=5,
             random_state=RANDOM_SEED,
