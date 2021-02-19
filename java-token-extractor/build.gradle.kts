@@ -10,6 +10,7 @@ dependencies {
 
 application {
     mainClassName = "experiment.component.App"
+    applicationDefaultJvmArgs = listOf("-Xmx10g", "-Xms5g")
 }
 
 java {
@@ -21,3 +22,4 @@ tasks.test {
     useJUnitPlatform()
     failFast = true
 }
+
