@@ -11,9 +11,9 @@ class Foo {
 
     void foo(int a) {
         logger.info("Hello");
-        doThat(() - {
+        doThat(() -> {
             logger.warn("Test 123");
-        })
+        });
     }
     // This lambda expression is ignored as it does not belong to a method body
     private static final F<Long> a = new F<>(() -> {
