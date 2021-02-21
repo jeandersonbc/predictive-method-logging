@@ -1,0 +1,161 @@
+[
+  {
+    "tokens": [
+      "LOG",
+      "info"
+    ],
+    "methodCalls": [
+      "LOG.info"
+    ],
+    "methodName": "Sample::(initializer 2)"
+  },
+  {
+    "tokens": [
+      "LOG",
+      "info"
+    ],
+    "methodCalls": [
+      "LOG.info"
+    ],
+    "methodName": "Sample::(initializer 1)"
+  },
+  {
+    "tokens": [
+      "foo",
+      "logger",
+      "warn",
+      "doSomething",
+      "Interface",
+      "run",
+      "a",
+      "LOG",
+      "info"
+    ],
+    "methodCalls": [
+      "logger.warn",
+      "doSomething{\n  void run{\n    LOG.info;\n  }\n}\n)",
+      "LOG.info"
+    ],
+    "methodName": "Sample$Foo::foo/0"
+  },
+  {
+    "tokens": [
+      "main",
+      "String",
+      "args",
+      "System",
+      "out",
+      "println",
+      "Sample",
+      "s",
+      "Sample",
+      "s",
+      "process"
+    ],
+    "methodCalls": [
+      "System.out.println",
+      "s.process"
+    ],
+    "methodName": "Sample::main/1[java.lang.String[]]"
+  },
+  {
+    "tokens": [
+      "process",
+      "List",
+      "Object",
+      "etc"
+    ],
+    "methodCalls": [],
+    "methodName": "Sample::process/1[List<java.lang.Object>]"
+  },
+  {
+    "tokens": [
+      "Sample",
+      "LOG",
+      "info"
+    ],
+    "methodCalls": [
+      "LOG.info"
+    ],
+    "methodName": "Sample::Sample/0"
+  },
+  {
+    "tokens": [
+      "run",
+      "a",
+      "LOG",
+      "info"
+    ],
+    "methodCalls": [
+      "LOG.info"
+    ],
+    "methodName": "Sample$Anonymous1::run/1[int]"
+  },
+  {
+    "tokens": [
+      "bar",
+      "call",
+      "doSomething",
+      "Interface",
+      "run",
+      "String",
+      "varArgs",
+      "LOG",
+      "info"
+    ],
+    "methodCalls": [
+      "call",
+      "doSomething{\n  void run{\n    LOG.info;\n  }\n}\n)",
+      "LOG.info"
+    ],
+    "methodName": "Sample$Foo::bar/0"
+  },
+  {
+    "tokens": [
+      "Sample",
+      "SomeAnnotation",
+      "Foo",
+      "bar",
+      "b",
+      "LOG",
+      "info",
+      "doSomething",
+      "Interface",
+      "run",
+      "a",
+      "LOG",
+      "info"
+    ],
+    "methodCalls": [
+      "LOG.info",
+      "doSomething{\n  void run{\n    LOG.info;\n  }\n}\n)",
+      "LOG.info"
+    ],
+    "methodName": "Sample::Sample/2[Sample.Foo,int]"
+  },
+  {
+    "tokens": [
+      "run",
+      "a",
+      "LOG",
+      "info"
+    ],
+    "methodCalls": [
+      "LOG.info"
+    ],
+    "methodName": "Sample$Foo$Anonymous2::run/1[int[]]"
+  },
+  {
+    "tokens": [
+      "run",
+      "String",
+      "varArgs",
+      "LOG",
+      "info"
+    ],
+    "methodCalls": [
+      "LOG.info"
+    ],
+    "methodName": "Sample$Foo$Anonymous3::run/1[java.lang.String[]]"
+  }
+]

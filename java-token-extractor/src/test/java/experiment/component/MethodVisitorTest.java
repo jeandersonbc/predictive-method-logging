@@ -22,12 +22,11 @@ public class MethodVisitorTest {
     public void shouldVisitExpectedMethods() throws URISyntaxException {
         Path rootDir = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource("examples")).toURI());
         Path targetFile = Paths.get(rootDir.toString(), "Sample.java");
-        String[] srcDir = {rootDir.toString()};
         String[] sourceFilePaths = {targetFile.toString()};
 
         MethodVisitor methodVisitor = new MethodVisitor();
 
-        ASTParser parser = JavaUtils.newParser(srcDir);
+        ASTParser parser = JavaUtils.newParser(rootDir);
         parser.createASTs(sourceFilePaths, null, new String[0], new FileASTRequestor() {
 
             @Override

@@ -3,19 +3,23 @@ package experiment.component;
 
 import org.eclipse.jdt.core.dom.*;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MethodVisitor extends ASTVisitor {
 
-    private final List<String> visitedMethods;
+    private final Set<MethodExtractedData> result;
+
     private final LinkedList<String> methodContext;
     private final LinkedList<String> classContext;
     private int anonymousClassContextCounter;
     private int staticContextCounter;
 
     public MethodVisitor() {
-        visitedMethods = new LinkedList<>();
+        result = new HashSet<>();
         classContext = new LinkedList<>();
         methodContext = new LinkedList<>();
     }
@@ -70,29 +74,54 @@ public class MethodVisitor extends ASTVisitor {
     @Override
     public boolean visit(Initializer node) {
         methodContext.addLast(String.format("(initializer %d)", ++staticContextCounter));
+        String id = classContext.peekLast() + "::" + methodContext.peekLast();
+
+        IdentifierAndMethodExprVisitor visitor = new IdentifierAndMethodExprVisitor();
+        node.accept(visitor);
+
+        MethodExtractedData data = new MethodExtractedData();
+        data.setMethodName(id);
+        data.setMethodCalls(visitor.getMethodCallExpressions());
+        data.setTokens(visitor.getIdentifiers());
+        result.add(data);
+
         return super.visit(node);
     }
 
     @Override
     public void endVisit(Initializer node) {
-        visitedMethods.add(classContext.peekLast() + "::" + methodContext.removeLast());
-        super.visit(node);
+        methodContext.removeLast();
+        super.endVisit(node);
     }
 
     @Override
     public boolean visit(MethodDeclaration node) {
         methodContext.addLast(JavaUtils.getMethodFullName(node));
+        String id = classContext.peekLast() + "::" + methodContext.peekLast();
+
+        IdentifierAndMethodExprVisitor visitor = new IdentifierAndMethodExprVisitor();
+        node.accept(visitor);
+
+        MethodExtractedData data = new MethodExtractedData();
+        data.setMethodName(id);
+        data.setMethodCalls(visitor.getMethodCallExpressions());
+        data.setTokens(visitor.getIdentifiers());
+        result.add(data);
+
         return super.visit(node);
     }
 
     @Override
     public void endVisit(MethodDeclaration node) {
-        visitedMethods.add(classContext.peekLast() + "::" + methodContext.removeLast());
+        methodContext.removeLast();
         super.endVisit(node);
     }
 
     public List<String> visitedMethods() {
-        return this.visitedMethods;
+        return this.result.stream().map(MethodExtractedData::getMethodName).collect(Collectors.toList());
     }
 
+    public Set<MethodExtractedData> getResult() {
+        return this.result;
+    }
 }

@@ -3,13 +3,15 @@ package experiment.component;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.*;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
 public class JavaUtils {
 
-    public static ASTParser newParser(String[] srcDir) {
+    public static ASTParser newParser(Path rootDir) {
+        String[] srcDir = new String[]{rootDir.toFile().getAbsolutePath()};
         ASTParser parser = ASTParser.newParser(AST.JLS13);
         parser.setResolveBindings(true);
         parser.setBindingsRecovery(true);

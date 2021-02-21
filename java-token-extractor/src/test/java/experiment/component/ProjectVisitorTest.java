@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -18,11 +19,11 @@ public class ProjectVisitorTest {
 
     @Test
     void shouldFindJavaSources() throws IOException, URISyntaxException {
-        Path root = Paths.get(getClass().getClassLoader().getResource("examples").toURI());
+        Path root = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource("examples")).toURI());
         ProjectVisitor projectVisitor = new ProjectVisitor();
         Files.walkFileTree(root, projectVisitor);
 
-        List<String> expectedFiles = Arrays.asList("LambdaExpressions.java", "Sample.java");
+        List<String> expectedFiles = Arrays.asList("LambdaExpressions.java", "Sample.java", "Identifier.java");
         List<String> foundFiles = collectFileNames(projectVisitor.visitedFiles());
 
         Collections.sort(expectedFiles);
