@@ -17,6 +17,7 @@ public class MethodVisitor extends ASTVisitor {
     private final LinkedList<String> classContext;
     private int anonymousClassContextCounter;
     private int staticContextCounter;
+    private int localTypeDeclCounter;
 
     public MethodVisitor() {
         result = new HashSet<>();
@@ -25,7 +26,7 @@ public class MethodVisitor extends ASTVisitor {
     }
 
     @Override
-    public boolean visit(TypeDeclaration node) {
+    public boolean visit(AnnotationTypeDeclaration node) {
         String name = node.getName().toString();
         if (node.isMemberTypeDeclaration()) {
             name = String.format("%s$%s", classContext.peekLast(), name);
@@ -35,9 +36,26 @@ public class MethodVisitor extends ASTVisitor {
     }
 
     @Override
+    public void endVisit(AnnotationTypeDeclaration node) {
+        classContext.removeLast();
+        super.endVisit(node);
+    }
+
+    @Override
+    public boolean visit(TypeDeclaration node) {
+        String name = node.getName().toString();
+        if (node.isMemberTypeDeclaration()) {
+            name = String.format("%s$%s", classContext.peekLast(), name);
+        } else if (node.isLocalTypeDeclaration()) {
+            name = String.format("%s$%d%s", classContext.peekLast(), ++localTypeDeclCounter, name);
+        }
+        classContext.addLast(name);
+        return super.visit(node);
+    }
+
+    @Override
     public void endVisit(TypeDeclaration node) {
         classContext.removeLast();
-        anonymousClassContextCounter = 0;
         super.endVisit(node);
     }
 
@@ -54,7 +72,6 @@ public class MethodVisitor extends ASTVisitor {
     @Override
     public void endVisit(EnumDeclaration node) {
         classContext.removeLast();
-        anonymousClassContextCounter = 0;
         super.endVisit(node);
     }
 
