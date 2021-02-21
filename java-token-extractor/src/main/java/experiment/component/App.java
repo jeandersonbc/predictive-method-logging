@@ -8,13 +8,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 public class App {
 
+    private static int progress = 0;
+
     public static void main(String[] args) throws IOException {
 
-        Path start = Paths.get(args[0]);
+        final Path start = Paths.get(args[0]);
 
         ProjectVisitor projectVisitor = new ProjectVisitor();
         Files.walkFileTree(start, projectVisitor);
@@ -24,18 +25,24 @@ public class App {
                 .map(e -> e.toFile().toString())
                 .toArray(String[]::new);
 
+        final int totalFiles = sources.length;
+
         ASTParser parser = JavaUtils.newParser(start);
-        System.out.println(Arrays.toString(sources));
         try (ResultWriter writer = new ResultWriter("tokens.json")) {
 
             parser.createASTs(sources, null, new String[0], new FileASTRequestor() {
 
                 @Override
                 public void acceptAST(String sourceFilePath, CompilationUnit ast) {
-                    System.out.println("Processing: " + sourceFilePath);
+                    double perc = 100.0 * ++progress / totalFiles;
+                    System.out.printf("File (%5.1f%%): %s%n", perc, sourceFilePath);
+
                     MethodVisitor methodVisitor = new MethodVisitor();
                     ast.accept(methodVisitor);
-                    writer.register(sourceFilePath, methodVisitor.getResult());
+
+                    Path relativePath = start.relativize(Paths.get(sourceFilePath));
+                    String formatted = String.format("./%s", relativePath.toString());
+                    writer.register(formatted, methodVisitor.getResult());
                 }
             }, null);
         }

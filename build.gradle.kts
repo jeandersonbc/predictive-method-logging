@@ -22,7 +22,7 @@ tasks.register<Exec>("fetch-projects-paper") {
 tasks.register<Exec>("deploy-aux-tools") {
     description = "Deploy auxiliary tools"
     group = "Tools"
-    dependsOn(":log-remover:distTar", ":log-placement-analyzer:distTar")
+    dependsOn(":log-remover:distTar", ":log-placement-analyzer:distTar", ":java-token-extractor:distTar")
     commandLine = listOf("./tools/deploy-aux-tools.sh")
 }
 

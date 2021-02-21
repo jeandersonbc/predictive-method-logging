@@ -83,3 +83,4 @@ We encourage you to explore your own ML training process and compare it with our
 2. `log-placement-analyzer`: Analyzes the placement of log statements in a project given a list of source files.
 3. `log-remover`: Removes log statement from a project
 4. `log-prediction`: ML component for experimentation
+5. `java-token-extractor`: Utility for tokens and method calls extraction
