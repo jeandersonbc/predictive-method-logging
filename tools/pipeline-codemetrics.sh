@@ -8,7 +8,6 @@ PROJECT_NAME="$(basename "$PROJECT_PATH")"
 BASEDIR="$(pwd)"
 TOOLSDIR="$BASEDIR/tools"
 LOG_REMOVAL_BASEDIR="$BASEDIR/out/log-removal/$PROJECT_NAME"
-ANALYSIS_DIR="$BASEDIR/out/analysis/$PROJECT_NAME"
 
 run_ck() {
     local input_path=$1
