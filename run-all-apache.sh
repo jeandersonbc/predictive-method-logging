@@ -92,9 +92,26 @@ create_dataset() {
   echo Done DATASET step
 }
 
+extract_textual_features() {
+  echo Running TEXTUAL FEATURES step
+  if [[ ! -d "$SELECTION_DIR" ]]; then
+    echo Missing SELECTION dir. Did you run the run-selection script?
+    echo Aborting
+    exit 1
+  fi
+
+  find "$SELECTION_DIR" -type f -path '*.sh' |
+    while read -r subject; do
+      echo Running "$subject"
+      time "$TOOLS_DIR/pipeline-textual-features.sh" "$subject"
+    done
+  echo Done TEXTUAL FEATURES step
+}
+
 # main
 time analysis
 time selection
 time log_removal
 time code_metrics
 time create_dataset
+time extract_textual_features
