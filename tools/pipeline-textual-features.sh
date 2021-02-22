@@ -33,9 +33,10 @@ run_validation() {
 
   "$TOOLSDIR"/validate_features.py "$txt_features_path" "$codemetrics_path"
 
-  if [[ ! "$?" ]]; then
+  if [[ ! "$?" == "0" ]]; then
     echo "Validation failed!"
     diff dump-df.csv dump-json-df.csv >"$OUTPUT_DIR"/validation.diff
+    mv dump-df.csv dump-json-df.csv "$OUTPUT_DIR"
   fi
 }
 
