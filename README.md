@@ -84,3 +84,11 @@ We encourage you to explore your own ML training process and compare it with our
 3. `log-remover`: Removes log statement from a project
 4. `log-prediction`: ML component for experimentation
 5. `java-token-extractor`: Utility for tokens and method calls extraction
+
+## Hungry for more?
+
+Feel free to post a question in the [Q&A Section](https://github.com/jeandersonbc/predictive-method-logging/discussions/categories/q-a) in the [Discussions](https://github.com/jeandersonbc/predictive-method-logging/discussions) tab.
+
+Please, keep the **Issues** for bugs/code-related concerns/etc.
+
+
